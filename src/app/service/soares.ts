@@ -21,7 +21,7 @@ export class SoaresService {
     if (direction === '') {
       direction = 'asc';
     }
-    let sUrl: string = this.sUrl + '/admin' + '?page=' + (page - 1) + '&size=' + rpp + '&sort=' + order + ',' + direction;
+    let sUrl: string = this.sUrl + '/admin' + '?page=' + page + '&size=' + rpp + '&sort=' + order + ',' + direction;
     if (filter) {
       sUrl += '&filter=' + filter;
     }
@@ -38,7 +38,7 @@ export class SoaresService {
     if (direction === '') {
       direction = 'asc';
     }
-    let sUrl: string = this.sUrl + '/user' + '?page=' + (page - 1) + '&size=' + rpp + '&sort=' + order + ',' + direction;
+    let sUrl: string = this.sUrl + '/user' + '?page=' + page + '&size=' + rpp + '&sort=' + order + ',' + direction;
     if (filter) {
       sUrl += '&filter=' + filter;
     }
@@ -67,5 +67,10 @@ export class SoaresService {
 
   empty(): Observable<number> {
     return this.oHttp.delete<number>(this.sUrl + '/empty');
+  }
+
+  checkPreguntaExists(pregunta: string, excludeId?: number): Observable<boolean> {
+    const params = excludeId ? `?excludeId=${excludeId}` : '';
+    return this.oHttp.post<boolean>(this.sUrl + '/check-exists' + params, { pregunta });
   }
 }

@@ -88,7 +88,10 @@ import { SoaresRoutedAdminPlist } from './component/soares/routed-admin-plist/ro
 import { SoaresRoutedAdminNew } from './component/soares/routed-admin-new/routed-admin-new';
 import { SoaresRoutedAdminEdit } from './component/soares/routed-admin-edit/routed-admin-edit';
 import { SoaresRoutedAdminRemove } from './component/soares/routed-admin-remove/routed-admin-remove';
+import { SoaresRoutedAdminView } from './component/soares/routed-admin-view/routed-admin-view';
 import { SoaresRoutedUserPlist } from './component/soares/routed-user-plist/routed-user-plist';
+import { SoaresRoutedUserView } from './component/soares/routed-user-view/routed-user-view';
+import { SoaresRoutedUserNew } from './component/soares/routed-user-new/routed-user-new';
 import { PreguntasPorTemaComponent } from './component/soares/preguntas-por-tema/preguntas-por-tema';
 import { RoutedAlfonsoAdminPlist } from './component/alfonso/routed-admin-plist/routed-admin-plist';
 import { RoutedAlfonsoAdminView } from './component/alfonso/routed-admin-view/routed-admin-view';
@@ -269,10 +272,12 @@ export const routes: Routes = [
   { path: 'alcanyiz/questionremove/:id', component: RoutedAlcanyizAdminRemove },
   { path: 'alcanyiz/questiongame', component: RoutedAlcanyizGame },
   { path: 'soares/user/plist', component: SoaresRoutedUserPlist },
+  { path: 'soares/user/view/:id', component: SoaresRoutedUserView },
   { path: 'soares/user/temas', component: PreguntasPorTemaComponent },
-  { path: 'soares/user/new', component: SoaresRoutedAdminNew },
+  { path: 'soares/user/new', component: SoaresRoutedUserNew },
   { path: 'soares/admin/plist', component: SoaresRoutedAdminPlist },
   { path: 'soares/admin/new', component: SoaresRoutedAdminNew },
+  { path: 'soares/admin/view/:id', component: SoaresRoutedAdminView },
   { path: 'soares/admin/edit/:id', component: SoaresRoutedAdminEdit },
   { path: 'soares/admin/remove/:id', component: SoaresRoutedAdminRemove },
   { path: 'tablon', component: TablonRoutedUserPlist },

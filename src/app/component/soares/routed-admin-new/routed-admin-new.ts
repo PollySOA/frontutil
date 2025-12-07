@@ -8,7 +8,7 @@ import { ISoares } from '../../../model/soares';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
-  selector: 'app-routed-admin-new',
+  selector: 'app-soares-routed-admin-new',
   templateUrl: './routed-admin-new.html',
   styleUrl: './routed-admin-new.css',
   standalone: true,
@@ -21,6 +21,8 @@ export class SoaresRoutedAdminNew implements OnInit {
 
   soaresForm!: FormGroup;
   error: string | null = null;
+  toastMessage: string | null = null;
+  toastType: 'success' | 'error' = 'success';
 
   ngOnInit(): void {
     this.soaresForm = this.fb.group({
@@ -36,12 +38,14 @@ export class SoaresRoutedAdminNew implements OnInit {
         preguntas: this.soaresForm.value.preguntas,
         publicacion: this.soaresForm.value.publicacion,
         fechaCreacion: '',
-        fechaModificacion: '',
-        aprobacion: true,
+        fechaModificacion: ''
       };
       this.soaresService.createOne(oSoares).subscribe({
         next: (id: number) => {
-          this.router.navigate(['/soares/admin/plist']);
+          this.mostrarToast('Frase creada correctamente', 'success');
+          setTimeout(() => {
+            this.router.navigate(['/soares/admin/plist']);
+          }, 2000);
         },
         error: (err: HttpErrorResponse) => {
           this.error = err.error.message || 'Error al crear la pregunta.';
@@ -49,5 +53,11 @@ export class SoaresRoutedAdminNew implements OnInit {
         }
       });
     }
+  }
+
+  mostrarToast(mensaje: string, tipo: 'success' | 'error') {
+    this.toastMessage = mensaje;
+    this.toastType = tipo;
+    setTimeout(() => this.toastMessage = null, 2000);
   }
 }

@@ -1,33 +1,32 @@
-/* Yo doy color y estilo a la cabecera de la tarjeta en la vista de administración */
-.card-header {
-    background-color: #007bff; /* Azul primario */
+/* New form styles aligned with blog aesthetics */
+
+:root{
+  --accent: #0d6efd;
+  --muted: #6c757d;
+  --card-border: rgba(0,0,0,0.06);
 }
 
-/* Yo agrego espacio interno a la tarjeta para que el contenido se vea ordenado */
-.card-body {
-    padding: 2rem;
+.new-form .form-card{
+  background:#fff;
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding:1.5rem;
+  box-shadow:0 12px 18px rgba(16,24,40,0.04);
 }
 
-/* Yo hago que las etiquetas de los formularios sean claras y visibles */
-.form-label {
-    font-weight: 600;
-    color: #333;
+.form-title{
+  margin:0;
+  font-size:1.25rem;
+  font-weight:700;
 }
 
-/* Yo pinto los botones principales de azul y les doy efecto al pasar el mouse */
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-}
+.form-label{ font-weight:600; }
 
-/* Yo cambio el color del botón principal cuando pasas el mouse */
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-}
+.form-text{ font-size:.85rem; }
 
-/* Yo pinto los botones secundarios de gris y les doy efecto al pasar el mouse */
-.btn-secondary {
+input.form-control, textarea.form-control{
+  border-radius:8px;
+}
     background-color: #6c757d;
     border-color: #6c757d;
 }

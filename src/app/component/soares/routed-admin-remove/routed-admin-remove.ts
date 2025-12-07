@@ -1,16 +1,15 @@
-// Componente que permite al administrador eliminar una pregunta y muestra mensajes de error si ocurre algún problema
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SoaresService } from '../../../service/soares';
 import { ISoares } from '../../../model/soares';
 import { HttpErrorResponse } from '@angular/common/http';
+import { UnroutedAdminViewSoares } from "../unrouted-admin-view/unrouted-admin-view";
 
 @Component({
-  selector: 'app-routed-admin-remove',
+  selector: 'app-soares-routed-admin-remove',
+  imports: [UnroutedAdminViewSoares],
   templateUrl: './routed-admin-remove.html',
-  styleUrl: './routed-admin-remove.css',
-  imports: [RouterLink, CommonModule],
+  styleUrl: './routed-admin-remove.css'
 })
 export class SoaresRoutedAdminRemove implements OnInit {
   private route = inject(ActivatedRoute);
@@ -18,31 +17,51 @@ export class SoaresRoutedAdminRemove implements OnInit {
   private soaresService = inject(SoaresService);
 
   oSoares: ISoares | null = null;
-  id: number = 0;
+  loading: boolean = true;
   error: string | null = null;
+  deleting: boolean = false;
 
   ngOnInit(): void {
-    this.id = parseInt(this.route.snapshot.paramMap.get('id') || '0');
-    this.soaresService.getOne(this.id).subscribe({
-      next: (oSoares: ISoares) => {
-        this.oSoares = oSoares;
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.error = 'ID no válido';
+      this.loading = false;
+      return;
+    }
+    this.load(+id);
+  }
+
+  load(id: number) {
+    this.soaresService.getOne(id).subscribe({
+      next: (data: ISoares) => {
+        this.oSoares = data;
+        this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error.message || 'Error al cargar la pregunta.';
-        console.log(err);
+        this.error = 'Error cargando la pregunta';
+        this.loading = false;
+        console.error(err);
       }
     });
   }
 
-  remove() {
-    this.soaresService.removeOne(this.id).subscribe({
-      next: (id: number) => {
+  confirmDelete() {
+    if (!this.oSoares) return;
+    this.deleting = true;
+    this.soaresService.removeOne(this.oSoares.id).subscribe({
+      next: () => {
+        this.deleting = false;
         this.router.navigate(['/soares/admin/plist']);
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error.message || 'Error al eliminar la pregunta.';
-        console.log(err);
-      }
+        this.deleting = false;
+        this.error = 'Error al eliminar la pregunta';
+        console.error(err);
+      },
     });
+  }
+
+  cancel() {
+    this.router.navigate(['/soares/admin/plist']);
   }
 }

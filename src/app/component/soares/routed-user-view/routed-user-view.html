@@ -1,0 +1,32 @@
+<div class="container m-5 post-view">
+    <article class="post-card p-5 border rounded shadow-sm">
+        <header class="post-header my-5">
+            <h1 class="post-title">{{ oSoares?.preguntas }}</h1>
+        </header>
+
+        <section class="post-content my-5">
+            <i class="bi bi-quote"></i>
+            <p class="lead">Esta pregunta espera ser respondida por el universo...</p>
+        </section>
+
+        <footer class="post-footer my-5 d-flex justify-content-between align-items-center">
+            <div class="post-meta text-muted small">
+                <span class="me-3">
+                    <i class="bi bi-calendar3"></i>
+                    Creada el {{ oSoares?.fechaCreacion }}
+                </span>
+                @if (oSoares?.fechaModificacion) {
+                <span class="me-3">
+                    <i class="bi bi-clock"></i>
+                    Modificada el {{ oSoares?.fechaModificacion }}
+                </span>
+                }
+            </div>
+            <div>
+                <a [routerLink]="['/soares/user/plist']" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Volver
+                </a>
+            </div>
+        </footer>
+    </article>
+</div>

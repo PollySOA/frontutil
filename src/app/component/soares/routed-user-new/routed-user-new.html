@@ -1,22 +1,107 @@
-<!-- Yo muestro el formulario para que el usuario cree una pregunta y vea mensajes de éxito o error -->
-<div class="container mt-4">
-    <h2>Crear pregunta</h2>
-    <form [formGroup]="soaresForm" (ngSubmit)="onSubmit()" class="mb-3">
-        <div class="mb-3">
-            <label for="preguntas" class="form-label">Pregunta</label>
-            <input type="text" id="preguntas" formControlName="preguntas" class="form-control"
-                placeholder="Escribe tu pregunta...">
-            <div *ngIf="soaresForm.get('preguntas')?.invalid && (soaresForm.get('preguntas')?.dirty || soaresForm.get('preguntas')?.touched)"
-                class="text-danger mt-1">
-                La pregunta es obligatoria y debe tener entre 3 y 255 caracteres.
+<div class="container my-4 new-form">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="form-card">
+                <header class="form-header mb-4">
+                    <h1 class="form-title">Solicitud de Frase Nueva</h1>
+                    <p class="text-muted small">Escribe tu pregunta para el universo y espera la aprobación del
+                        administrador</p>
+                </header>
+
+                @if (error) {
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                </div>
+                }
+
+                <form [formGroup]="soaresForm" novalidate>
+                    <div class="mb-4">
+                        <label for="preguntas" class="form-label">Pregunta <span class="text-danger">*</span></label>
+                        <textarea class="form-control" [class.is-invalid]="preguntas?.invalid && preguntas?.touched"
+                            [class.is-valid]="preguntas?.valid && preguntas?.touched" id="preguntas"
+                            formControlName="preguntas" rows="5" placeholder="Escribe tu pregunta..."></textarea>
+                        <div style="min-height: 24px;">
+                            @if (preguntas?.invalid && preguntas?.touched) {
+                            <div class="invalid-feedback d-block">
+                                @if (preguntas?.errors?.['required']) {
+                                <span>La pregunta es obligatoria.</span>
+                                }
+                                @if (preguntas?.errors?.['minlength']) {
+                                <span>La pregunta debe tener al menos 3 caracteres.</span>
+                                }
+                                @if (preguntas?.errors?.['maxlength']) {
+                                <span>La pregunta no puede superar 500 caracteres.</span>
+                                }
+                                @if (preguntas?.errors?.['preguntaExists']) {
+                                <span>Esta pregunta ya existe. Por favor, escribe una pregunta diferente.</span>
+                                }
+                            </div>
+                            }
+                            @if (preguntas?.pending) {
+                            <div class="form-text text-muted">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                Verificando si la pregunta ya existe...
+                            </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <a [routerLink]="['/soares/user/plist']" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Cancelar
+                        </a>
+                        <button type="button" class="btn btn-primary" [disabled]="submitting || soaresForm.invalid"
+                            data-bs-toggle="modal" data-bs-target="#modalConfirmar">
+                            <i class="bi bi-send me-2"></i>Enviar Solicitud
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary" [disabled]="soaresForm.invalid">Crear pregunta</button>
-    </form>
-    <div *ngIf="success" class="alert alert-success mt-3">
-        Solicitud de pregunta enviada con éxito. Espera aprobación del administrador.
     </div>
-    <div *ngIf="error" class="alert alert-danger mt-3">
-        {{ error }}
+
+    <!-- Modal de Confirmación -->
+    <div class="modal fade" id="modalConfirmar" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-send-check me-2"></i>Confirmar Solicitud
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas enviar esta solicitud de frase?</p>
+                    <p class="text-muted small mb-0">El administrador revisará tu pregunta antes de publicarla.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" (click)="confirmarEnvio()" [disabled]="submitting">
+                        @if (submitting) {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        }
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
+        @if (toastMessage) {
+        <div class="toast show" role="alert" [class.bg-success]="toastType === 'success'"
+            [class.bg-danger]="toastType === 'error'" [class.text-white]="true">
+            <div class="toast-body d-flex align-items-center">
+                @if (toastType === 'success') {
+                <i class="bi bi-check-circle-fill me-2"></i>
+                } @else {
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                }
+                {{ toastMessage }}
+                <button type="button" class="btn-close btn-close-white ms-auto" (click)="toastMessage = null"></button>
+            </div>
+        </div>
+        }
     </div>
 </div>

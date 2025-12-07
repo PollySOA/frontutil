@@ -41,16 +41,34 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <button type="submit" class="btn btn-primary" [disabled]="soaresForm.invalid">
-                                <i class="bi bi-send"></i> Crear
-                            </button>
                             <a [routerLink]="['/soares/admin/plist']" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Volver al Listado
                             </a>
+                            <button type="submit" class="btn btn-primary" [disabled]="soaresForm.invalid">
+                                <i class="bi bi-send"></i> Crear
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
+    @if (toastMessage) {
+    <div class="toast show" role="alert" [class.bg-success]="toastType === 'success'"
+        [class.bg-danger]="toastType === 'error'" [class.text-white]="true">
+        <div class="toast-body d-flex align-items-center">
+            @if (toastType === 'success') {
+            <i class="bi bi-check-circle-fill me-2"></i>
+            } @else {
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            }
+            {{ toastMessage }}
+            <button type="button" class="btn-close btn-close-white ms-auto" (click)="toastMessage = null"></button>
+        </div>
+    </div>
+    }
 </div>

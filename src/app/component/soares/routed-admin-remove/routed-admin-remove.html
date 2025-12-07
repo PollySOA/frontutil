@@ -1,39 +1,39 @@
-<!-- Yo muestro la página para confirmar la eliminación de una pregunta, mostrando los datos y botones para eliminar o cancelar -->
-<div class="container mt-5">
+<div class="container my-5 remove-post">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg">
-                <div class="card-header bg-danger text-white">
-                    <h3 class="mb-0">Eliminar Pregunta al Universo #{{ id }}</h3>
-                </div>
-                <div class="card-body">
-                    <div *ngIf="oSoares">
-                        <p class="lead">¿Estás seguro de que deseas eliminar la siguiente pregunta?</p>
-                        <div class="alert alert-warning" role="alert">
-                            <strong>ID:</strong> {{ oSoares.id }} <br>
-                            <strong>Pregunta:</strong> {{ oSoares.preguntas }} <br>
-                            <strong>Publicación:</strong> {{ oSoares.publicacion ? 'Sí' : 'No' }}
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <button class="btn btn-danger" (click)="remove()">
-                                <i class="bi bi-trash"></i> Confirmar Eliminación
-                            </button>
-                            <a [routerLink]="['/soares/admin/plist']" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left"></i> Cancelar
-                            </a>
-                        </div>
-                    </div>
-                    <div *ngIf="!oSoares && !error">
-                        <p class="text-center">Cargando pregunta...</p>
-                    </div>
-                    <div *ngIf="error" class="alert alert-danger" role="alert">
-                        {{ error }}
-                        <a [routerLink]="['/soares/admin/plist']" class="btn btn-secondary mt-3">
-                            <i class="bi bi-arrow-left"></i> Volver al Listado
-                        </a>
-                    </div>
+        <div class="col-12 col-lg-10">
+            @if (loading) {
+            <div class="d-flex justify-content-center my-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
                 </div>
             </div>
+            } @if (error) {
+            <div class="alert alert-danger" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+            </div>
+            } @if (!loading && !error && oSoares) {
+
+            <app-unrouted-admin-view-soares [oSoares]="oSoares"> </app-unrouted-admin-view-soares>
+
+            <div class="confirm-box p-4 border rounded bg-light">
+                <h2 class="h5 mb-3">Confirmar borrado</h2>
+                <p class="text-muted mb-4">
+                    ¿Seguro que deseas borrar esta pregunta? Esta acción no se puede deshacer.
+                </p>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-outline-secondary" (click)="cancel()">
+                        <i class="bi bi-arrow-left me-2"></i>Cancelar
+                    </button>
+                    <button class="btn btn-danger" [disabled]="deleting" (click)="confirmDelete()">
+                        @if (deleting) {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        } @if (!deleting) {
+                        <i class="bi bi-trash me-2"></i>
+                        } Borrar Definitivamente
+                    </button>
+                </div>
+            </div>
+            }
         </div>
     </div>
 </div>

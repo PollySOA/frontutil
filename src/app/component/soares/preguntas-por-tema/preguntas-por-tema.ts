@@ -6,7 +6,7 @@ import { SoaresService } from '../../../service/soares';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-preguntas-por-tema',
+  selector: 'app-soares-preguntas-por-tema',
   templateUrl: './preguntas-por-tema.html',
   styleUrl: './preguntas-por-tema.css',
   standalone: true,

@@ -1,13 +1,13 @@
-// Componente que muestra el detalle de una pregunta para el usuario
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ISoares } from '../../../model/soares';
 
 @Component({
   selector: 'app-unrouted-user-view-soares',
+  imports: [RouterLink],
   templateUrl: './unrouted-user-view.html',
   styleUrl: './unrouted-user-view.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnroutedUserViewSoares {
-  oSoares = input<ISoares | null>(null);
+  @Input() oSoares: ISoares | null = null;
 }

@@ -1,13 +1,6 @@
-// Componente que muestra la vista de administración con controles para filtrar, crear, generar datos y una tabla con preguntas y acciones
-// Obtiene la página de preguntas para el administrador, validando que la página no sea negativa
-// Cambia la cantidad de elementos por página
-// Cambia el orden de las preguntas en la tabla
-// Filtra las preguntas según el texto ingresado
-// Genera datos de prueba y vacía la lista
-// Permite al administrador publicar o despublicar una pregunta
-// Permite al administrador aprobar o desaprobar una pregunta
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IPage } from '../../../model/plist';
@@ -15,138 +8,198 @@ import { ISoares } from '../../../model/soares';
 import { SoaresService } from '../../../service/soares';
 import { Paginacion } from "../../shared/paginacion/paginacion";
 import { BotoneraRpp } from "../../shared/botonera-rpp/botonera-rpp";
-import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-routed-admin-plist',
+  selector: 'app-soares-routed-admin-plist',
+  imports: [RouterLink, FormsModule, CommonModule, Paginacion, BotoneraRpp],
   templateUrl: './routed-admin-plist.html',
   styleUrl: './routed-admin-plist.css',
-  standalone: true,
-  imports: [RouterLink, Paginacion, BotoneraRpp, FormsModule, CommonModule],
 })
-export class SoaresRoutedAdminPlist implements OnInit {
-    soloPendientes: boolean = false;
+export class SoaresRoutedAdminPlist {
   oPage: IPage<ISoares> | null = null;
   numPage: number = 0;
   numRpp: number = 5;
-  numTotalPages: number = 0;
-  numTotalElements: number = 0;
+  rellenaCantidad: number = 10;
+  rellenando: boolean = false;
+  rellenaOk: number | null = null;
+  rellenaError: string | null = null;
+  searchText: string = '';
+  searchTimeout: any = null;
   orderField: string = 'id';
   orderDirection: string = 'asc';
-  filter: string = '';
-  numPopulate: number = 10;
+  successMessage: string | null = null;
+  errorMessage: string | null = null;
+  filtroPublicacion: 'todas' | 'publicadas' | 'solicitudes' = 'todas';
+  toastMessage: string | null = null;
+  toastType: 'success' | 'error' = 'success';
 
-  constructor(private soaresService: SoaresService) {}
+  constructor(private oSoaresService: SoaresService) { }
 
-  ngOnInit(): void {
+  oBotonera: string[] = [];
+
+  ngOnInit() {
     this.getPage();
   }
 
-  getPage(): void {
-    // Validar que la página nunca sea negativa
-    const safePage = this.numPage < 0 ? 0 : this.numPage;
-    this.soaresService.getPageAdmin(
-      safePage,
-      this.numRpp,
-      this.orderField,
-      this.orderDirection,
-      this.filter,
-      this.soloPendientes
-    ).subscribe({
-      next: (resp: IPage<ISoares>) => {
-        this.oPage = resp;
-        this.numTotalPages = resp.totalPages;
-        this.numTotalElements = resp.totalElements;
-        this.numPage = resp.number;
+  getPage() {
+    let soloPendientes = false;
+    let filter = this.searchText;
+    
+    if (this.filtroPublicacion === 'solicitudes') {
+      soloPendientes = true;
+    }
+
+    this.oSoaresService.getPageAdmin(this.numPage, this.numRpp, this.orderField, this.orderDirection, filter, soloPendientes).subscribe({
+      next: (data: IPage<ISoares>) => {
+        // Client-side filtering for "publicadas" since backend doesn't support it in admin endpoint
+        if (this.filtroPublicacion === 'publicadas') {
+          data.content = data.content.filter(item => item.publicacion === true);
+        }
+        this.oPage = data;
+        this.rellenaOk = null;
+        this.rellenaError = null;
+        if (this.numPage > 0 && this.numPage >= data.totalPages) {
+          this.numPage = data.totalPages - 1;
+          this.getPage();
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error(error);
+        this.mostrarToast('Error al cargar las preguntas', 'error');
+      },
+    });
+  }
+
+  goToPage(numPage: number) {
+    this.numPage = numPage;
+    this.getPage();
+    return false;
+  }
+
+  onRppChange(n: number) {
+    this.numRpp = n;
+    this.getPage();
+    return false;
+  }
+
+  onCantidadChange(value: string) {
+    this.rellenaCantidad = +value;
+    return false;
+  }
+
+  generarFake() {
+    this.rellenaOk = null;
+    this.rellenaError = null;
+    this.rellenando = true;
+    this.oSoaresService.populate(this.rellenaCantidad).subscribe({
+      next: (count: number) => {
+        this.rellenando = false;
+        this.rellenaOk = count;
+        this.mostrarToast(`${count} frases generadas correctamente`, 'success');
+        this.getPage();
       },
       error: (err: HttpErrorResponse) => {
-        console.log(err);
-      }
-    })
+        this.rellenando = false;
+        this.rellenaError = 'Error generando datos fake';
+        this.mostrarToast('Error generando frases', 'error');
+        console.error(err);
+      },
+    });
   }
 
-  onPageChange(n: number) {
-    // Validar que la página nunca sea negativa
-    this.numPage = n < 0 ? 0 : n;
+  vaciarPreguntas() {
+    if (!confirm('¿Estás seguro de que deseas vaciar todas las preguntas?')) {
+      return;
+    }
+    this.oSoaresService.empty().subscribe({
+      next: () => {
+        this.getPage();
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Error vaciando preguntas:', err);
+      },
+    });
+  }
+
+  togglePublicacion(oSoares: ISoares) {
+    oSoares.publicacion = !oSoares.publicacion;
+    this.oSoaresService.updateOne(oSoares).subscribe({
+      next: () => {
+        this.mostrarToast(oSoares.publicacion ? 'Pregunta publicada correctamente' : 'Pregunta despublicada correctamente', 'success');
+        this.getPage();
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error(error);
+        oSoares.publicacion = !oSoares.publicacion;
+        this.mostrarToast('Error al actualizar la publicación', 'error');
+      },
+    });
+  }
+
+  onSearchChange(value: string) {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = null;
+    }
+    this.searchTimeout = setTimeout(() => {
+      this.searchTimeout = null;
+      this.numPage = 0;
+      this.getPage();
+    }, 500);
+  }
+
+  limpiarBusqueda() {
+    this.searchText = '';
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+    this.numPage = 0;
     this.getPage();
   }
 
-  onRppChange(rpp: number) {
-    this.numRpp = rpp;
+  ordenar(field: string) {
+    if (this.orderField === field) {
+      this.orderDirection = this.orderDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.orderField = field;
+      this.orderDirection = 'asc';
+    }
+    this.numPage = 0;
+    this.getPage();
+  }
+
+  setSortColumn(column: string) {
+    this.orderField = column;
+    this.orderDirection = this.orderDirection === 'asc' ? 'desc' : 'asc';
     this.numPage = 0;
     this.getPage();
     return false;
   }
 
-  onOrder(order: string) {
-    this.orderField = order;
-    this.orderDirection = this.orderDirection === 'asc' ? 'desc' : 'asc';
-    this.getPage();
-  }
-
-  onFilterChange(filter: string) {
-    this.filter = filter;
+  filtrarPor(filtro: 'todas' | 'publicadas' | 'solicitudes') {
+    this.filtroPublicacion = filtro;
     this.numPage = 0;
     this.getPage();
   }
 
-  onPopulate(amount: any) {
-    amount = parseInt(amount);
-    this.soaresService.populate(amount).subscribe({
-      next: (resp: number) => {
-        this.numTotalElements = resp;
-        this.getPage();
-      },
-      error: (err: HttpErrorResponse) => {
-        console.log(err);
-      }
-    })
-  }
-
-  onEmpty() {
-    this.soaresService.empty().subscribe({
-      next: (resp: number) => {
-        this.numTotalElements = resp;
-        this.getPage();
-      },
-      error: (err: HttpErrorResponse) => {
-        console.log(err);
-      }
-    })
-  }
-
-  // Lógica para el botón de Publicación (toggle)
-  togglePublicacion(soares: ISoares): void {
-    const updatedSoares: ISoares = {
-      ...soares,
-      publicacion: !soares.publicacion,
-    };
-    this.soaresService.updateOne(updatedSoares).subscribe({
+  confirmarVaciar() {
+    this.oSoaresService.empty().subscribe({
       next: () => {
-        soares.publicacion = !soares.publicacion; // Actualiza el estado localmente
+        this.rellenaOk = null;
+        this.rellenaError = null;
+        this.mostrarToast('Todas las preguntas han sido eliminadas', 'success');
+        this.getPage();
       },
       error: (err: HttpErrorResponse) => {
-        console.error('Error al cambiar el estado de publicación:', err);
+        console.error('Error vaciando preguntas:', err);
+        this.mostrarToast('Error al vaciar las preguntas', 'error');
       },
     });
   }
 
-  // Lógica para el botón de Aprobación (toggle)
-  toggleAprobacion(soares: ISoares): void {
-    // Lógica de aprobación: si está pendiente, se aprueba. Si está aprobado, se desaprueba (vuelve a pendiente).
-    // Asumo que 'aprobacion' es un campo booleano o similar. Si es un estado más complejo (e.g., 'PENDIENTE', 'APROBADO', 'RECHAZADO'),
-    // se necesitaría más información. Por ahora, lo implemento como un simple toggle booleano.
-    const updatedSoares: ISoares = {
-      ...soares,
-      aprobacion: !soares.aprobacion, // Asumiendo que existe un campo 'aprobacion' en ISoares
-    };
-    this.soaresService.updateOne(updatedSoares).subscribe({
-      next: () => {
-        soares.aprobacion = !soares.aprobacion; // Actualiza el estado localmente
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error('Error al cambiar el estado de aprobación:', err);
-      },
-    });
+  mostrarToast(mensaje: string, tipo: 'success' | 'error') {
+    this.toastMessage = mensaje;
+    this.toastType = tipo;
+    setTimeout(() => this.toastMessage = null, 2000);
   }
 }
