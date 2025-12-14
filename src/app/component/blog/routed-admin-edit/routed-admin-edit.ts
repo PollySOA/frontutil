@@ -46,6 +46,7 @@ export class RoutedAdminEdit implements OnInit {
                 Validators.required,
                 Validators.minLength(10)]],
             etiquetas: ['', [Validators.maxLength(100)]],
+            publicado: [false]
         });
     }
 
@@ -57,6 +58,7 @@ export class RoutedAdminEdit implements OnInit {
                     titulo: blog.titulo,
                     contenido: blog.contenido,
                     etiquetas: blog.etiquetas,
+                    publicado: blog.publicado,
                 });
                 this.loading = false;
             },
@@ -79,7 +81,8 @@ export class RoutedAdminEdit implements OnInit {
             id: this.blogId!,
             titulo: this.blogForm.value.titulo,
             contenido: this.blogForm.value.contenido,
-            etiquetas: this.blogForm.value.etiquetas
+            etiquetas: this.blogForm.value.etiquetas,
+            publicado: this.blogForm.value.publicado
         };
 
         this.blogService.update(payload).subscribe({

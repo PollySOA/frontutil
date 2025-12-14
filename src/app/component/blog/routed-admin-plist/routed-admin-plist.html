@@ -69,11 +69,62 @@
     <table class="table table-striped table-bordered">
       <thead>
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Título</th>
-          <th scope="col">Etiquetas</th>
-          <th scope="col">Creación</th>
-          <th scope="col">Actualización</th>
+          <th scope="col" (click)="onOrder('id')" style="cursor:pointer; width:5%">
+            <span class="header-inline">ID
+              @if (orderField === 'id') {
+                @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1" aria-hidden="true"></i>
+                } @if (orderDirection === 'desc') {
+                  <i class="bi bi-caret-down-fill ms-1" aria-hidden="true"></i>
+                }
+              }
+            </span>
+          </th>
+          <th scope="col" (click)="onOrder('titulo')" style="cursor:pointer; width:35%">
+            <span class="header-inline">Título
+              @if (orderField === 'titulo') {
+                @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1" aria-hidden="true"></i>
+                } @if (orderDirection === 'desc') {
+                  <i class="bi bi-caret-down-fill ms-1" aria-hidden="true"></i>
+                }
+              }
+            </span>
+          </th>
+          <th scope="col" style="width:20%">Etiquetas</th>
+          <th scope="col" (click)="onOrder('publicado')" style="cursor:pointer; width:10%">
+            <span class="header-inline">Estado
+              @if (orderField === 'publicado') {
+                @if (orderDirection === 'asc') {
+                    <i class="bi bi-caret-up-fill ms-1" aria-hidden="true"></i>
+                } @if (orderDirection === 'desc') {
+                    <i class="bi bi-caret-down-fill ms-1" aria-hidden="true"></i>
+                }
+              }
+            </span>
+          </th>
+          <th scope="col" (click)="onOrder('fechaCreacion')" style="cursor:pointer; width:15%">
+            <span class="header-inline">Creación
+              @if (orderField === 'fechaCreacion') {
+                @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1"></i>
+                } @if (orderDirection === 'desc') {
+                  <i class="bi bi-caret-down-fill ms-1"></i>
+                }
+              }
+            </span>
+          </th>
+          <th scope="col" (click)="onOrder('fechaModificacion')" style="cursor:pointer; width:10%">
+            <span class="header-inline">Actualización
+              @if (orderField === 'fechaModificacion') {
+                @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1" aria-hidden="true"></i>
+                } @if (orderDirection === 'desc') {
+                  <i class="bi bi-caret-down-fill ms-1" aria-hidden="true"></i>
+                }
+              }
+            </span>
+          </th>
           <th scope="col">Operaciones</th>
         </tr>
       </thead>
@@ -83,6 +134,17 @@
           <th scope="row">{{ oBlog.id }}</th>
           <td>{{ oBlog.titulo }}</td>
           <td>{{ oBlog.etiquetas }}</td>
+          <td class="text-center align-middle">
+            @if (oBlog.publicado) {
+            <span class="text-success d-inline-flex align-items-center">
+              <i class="bi bi-check-circle-fill me-1"></i>
+            </span>
+            } @if (!oBlog.publicado) {
+            <span class="text-secondary d-inline-flex align-items-center">
+              <i class="bi bi-x-circle-fill me-1"></i>
+            </span>
+            }
+          </td>
           <td>{{ oBlog.fechaCreacion | datetime }}</td>
           <td>{{ oBlog.fechaModificacion | datetime }}</td>
           <td>
@@ -93,6 +155,42 @@
               <a [routerLink]="['/blog/edit', oBlog.id]" class="btn btn-outline-secondary">
                 <i class="bi bi-pencil-square"></i>
               </a>
+              @if (!oBlog.publicado) {
+              <button
+                class="btn btn-outline-success"
+                title="Publicar"
+                [disabled]="publishingId === oBlog.id"
+                (click)="publicar(oBlog.id)"
+              >
+                @if (publishingId === oBlog.id && publishingAction === 'publicar') {
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                } @if (!(publishingId === oBlog.id && publishingAction === 'publicar')) {
+                <i class="bi bi-upload"></i>
+                }
+              </button>
+              } @if (oBlog.publicado) {
+              <button
+                class="btn btn-outline-danger"
+                title="Despublicar"
+                [disabled]="publishingId === oBlog.id"
+                (click)="despublicar(oBlog.id)"
+              >
+                @if (publishingId === oBlog.id && publishingAction === 'despublicar') {
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                } @if (!(publishingId === oBlog.id && publishingAction === 'despublicar')) {
+                <i class="bi bi-eye-slash"></i>
+                }
+              </button>
+              }
+
               <a [routerLink]="['/blog/remove', oBlog.id]" class="btn btn-outline-danger">
                 <i class="bi bi-trash"></i>
               </a>

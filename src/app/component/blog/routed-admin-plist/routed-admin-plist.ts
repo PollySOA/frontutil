@@ -22,17 +22,22 @@ export class RoutedAdminPlist {
   rellenando: boolean = false;
   rellenaOk: number | null = null;
   rellenaError: string | null = null;
+  // track id being published/unpublished to show spinner per-row
+  publishingId: number | null = null;
+  publishingAction: 'publicar' | 'despublicar' | null = null;
 
   constructor(private oBlogService: BlogService) { }
 
   oBotonera: string[] = [];
+  orderField: string = 'id';
+  orderDirection: string = 'asc';
 
   ngOnInit() {
     this.getPage();
   }
 
   getPage() {
-    this.oBlogService.getPage(this.numPage, this.numRpp).subscribe({
+    this.oBlogService.getPage(this.numPage, this.numRpp, this.orderField, this.orderDirection).subscribe({
       next: (data: IPage<IBlog>) => {
         this.oPage = data;
         this.rellenaOk = this.oPage.totalElements;
@@ -46,6 +51,18 @@ export class RoutedAdminPlist {
         console.error(error);
       },
     });
+  }
+
+  onOrder(order: string) {
+    if (this.orderField === order) {
+      this.orderDirection = this.orderDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.orderField = order;
+      this.orderDirection = 'asc';
+    }
+    this.numPage = 0;
+    this.getPage();
+    return false;
   }
 
   goToPage(numPage: number) {
@@ -81,5 +98,41 @@ export class RoutedAdminPlist {
         console.error(err);
       }
     });
+  }
+
+  publicar(id: number) {
+    this.publishingId = id;
+    this.publishingAction = 'publicar';
+    this.oBlogService.publicar(id).subscribe({
+      next: () => {
+        this.publishingId = null;
+        this.publishingAction = null;
+        this.getPage();
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error(err);
+        this.publishingId = null;
+        this.publishingAction = null;
+      }
+    });
+    return false;
+  }
+
+  despublicar(id: number) {
+    this.publishingId = id;
+    this.publishingAction = 'despublicar';
+    this.oBlogService.despublicar(id).subscribe({
+      next: () => {
+        this.publishingId = null;
+        this.publishingAction = null;
+        this.getPage();
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error(err);
+        this.publishingId = null;
+        this.publishingAction = null;
+      }
+    });
+    return false;
   }
 }

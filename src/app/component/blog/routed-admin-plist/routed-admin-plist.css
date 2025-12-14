@@ -1,0 +1,34 @@
+
+/* Ensure header label + icon stay on a single line */
+.table thead th .header-inline {
+	display: inline-flex;
+	align-items: center;
+	white-space: nowrap;
+	gap: 0.25rem;
+}
+
+/* Prevent header cells from wrapping their contents */
+.table thead th {
+	white-space: nowrap;
+	vertical-align: middle;
+	padding: 0.5rem;
+}
+
+/* Allow table cells to display content properly */
+.table td {
+	vertical-align: middle;
+	padding: 0.5rem;
+	word-wrap: break-word;
+}
+
+/* Make sort icons small and aligned */
+.table thead th i {
+	font-size: 0.85rem;
+	vertical-align: middle;
+}
+
+/* Ensure operations column doesn't wrap */
+.table td:last-child {
+	white-space: nowrap;
+}
+

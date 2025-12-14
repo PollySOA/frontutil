@@ -40,6 +40,7 @@ export class RoutedAdminNew implements OnInit {
         Validators.minLength(3),
         Validators.maxLength(1024)
       ]],
+      publicado: [false]
     });
   }
 
@@ -54,6 +55,7 @@ export class RoutedAdminNew implements OnInit {
       titulo: this.blogForm.value.titulo,
       contenido: this.blogForm.value.contenido,
       etiquetas: this.blogForm.value.etiquetas,
+      publicado: this.blogForm.value.publicado,
     };
 
     this.blogService.create(payload).subscribe({
@@ -79,5 +81,9 @@ export class RoutedAdminNew implements OnInit {
 
   get etiquetas() {
     return this.blogForm.get('etiquetas');
+  }
+
+  get publicado() {
+    return this.blogForm.get('publicado');
   }
 }

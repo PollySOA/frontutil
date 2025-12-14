@@ -42,4 +42,12 @@ export class BlogService {
     return this.oHttp.get<number>(serverURL + '/blog/rellena/' + numPosts);
   }
 
+  publicar(id: number): Observable<number> {
+    return this.oHttp.put<number>(serverURL + '/blog/publicar/' + id, {});
+  }
+
+  despublicar(id: number): Observable<number> {
+    return this.oHttp.put<number>(serverURL + '/blog/despublicar/' + id, {});
+  }
+
 }
