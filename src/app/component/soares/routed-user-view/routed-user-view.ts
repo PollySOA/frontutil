@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ISoares } from '../../../model/soares';
+import { ISoares } from '../../../model/soares/soares';
 import { SoaresService } from '../../../service/soares';
 
 @Component({

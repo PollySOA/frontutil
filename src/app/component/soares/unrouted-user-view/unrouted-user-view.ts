@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ISoares } from '../../../model/soares';
+import { ISoares } from '../../../model/soares/soares';
 
 @Component({
   selector: 'app-unrouted-user-view-soares',

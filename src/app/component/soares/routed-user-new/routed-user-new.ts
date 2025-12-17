@@ -30,8 +30,11 @@ export class SoaresRoutedUserNew implements OnInit {
   initForm(): void {
     this.soaresForm = this.fb.group({
       preguntas: ['', 
-        [Validators.required, Validators.minLength(3), Validators.maxLength(500)],
-        [this.preguntaExistsValidator()]
+        {
+          validators: [Validators.required, Validators.minLength(3), Validators.maxLength(500)],
+          asyncValidators: [this.preguntaExistsValidator()],
+          updateOn: 'blur'
+        }
       ],
     });
   }
@@ -42,7 +45,7 @@ export class SoaresRoutedUserNew implements OnInit {
         return of(null);
       }
       return of(control.value).pipe(
-        debounceTime(800),
+        debounceTime(300),
         switchMap(value => 
           this.soaresService.checkPreguntaExists(value).pipe(
             map(exists => exists ? { preguntaExists: true } : null),
@@ -69,21 +72,13 @@ export class SoaresRoutedUserNew implements OnInit {
     this.soaresService.createOne(payload).subscribe({
       next: () => {
         this.submitting = false;
-        // Cerrar modal correctamente
+        // Cerrar modal
         const modalElement = document.getElementById('modalConfirmar');
         if (modalElement) {
           const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
           if (modal) {
             modal.hide();
           }
-          // Remover backdrop manualmente si queda
-          setTimeout(() => {
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) backdrop.remove();
-            document.body.classList.remove('modal-open');
-            document.body.style.removeProperty('overflow');
-            document.body.style.removeProperty('padding-right');
-          }, 100);
         }
         // Mostrar toast
         this.mostrarToast('Solicitud enviada correctamente. Espera la aprobación del administrador.', 'success');
@@ -94,21 +89,13 @@ export class SoaresRoutedUserNew implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         this.submitting = false;
-        // Cerrar modal correctamente
+        // Cerrar modal
         const modalElement = document.getElementById('modalConfirmar');
         if (modalElement) {
           const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
           if (modal) {
             modal.hide();
           }
-          // Remover backdrop manualmente si queda
-          setTimeout(() => {
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) backdrop.remove();
-            document.body.classList.remove('modal-open');
-            document.body.style.removeProperty('overflow');
-            document.body.style.removeProperty('padding-right');
-          }, 100);
         }
         // Mostrar toast de error
         this.mostrarToast('Error al enviar la solicitud', 'error');

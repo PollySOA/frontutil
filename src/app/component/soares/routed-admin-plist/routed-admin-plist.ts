@@ -1,17 +1,16 @@
 import { Component } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IPage } from '../../../model/plist';
-import { ISoares } from '../../../model/soares';
+import { ISoares } from '../../../model/soares/soares';
 import { SoaresService } from '../../../service/soares';
 import { Paginacion } from "../../shared/paginacion/paginacion";
 import { BotoneraRpp } from "../../shared/botonera-rpp/botonera-rpp";
 
 @Component({
   selector: 'app-soares-routed-admin-plist',
-  imports: [RouterLink, FormsModule, CommonModule, Paginacion, BotoneraRpp],
+  imports: [RouterLink, CommonModule, Paginacion, BotoneraRpp],
   templateUrl: './routed-admin-plist.html',
   styleUrl: './routed-admin-plist.css',
 })
@@ -23,8 +22,8 @@ export class SoaresRoutedAdminPlist {
   rellenando: boolean = false;
   rellenaOk: number | null = null;
   rellenaError: string | null = null;
-  searchText: string = '';
-  searchTimeout: any = null;
+  searchTerm: string = '';
+  private searchTimer: any = null;
   orderField: string = 'id';
   orderDirection: string = 'asc';
   successMessage: string | null = null;
@@ -47,20 +46,28 @@ export class SoaresRoutedAdminPlist {
     this.getPage();
   }
 
+  ngAfterViewInit() {
+    const modalElement = document.getElementById('modalVer');
+    if (modalElement) {
+      modalElement.addEventListener('hidden.bs.modal', () => {
+        this.cerrarModalVer();
+      });
+    }
+  }
+
   getPage() {
     let soloPendientes = false;
-    let filter = this.searchText;
+    let soloPublicadas = false;
+    const filter = this.searchTerm.trim();
     
     if (this.filtroPublicacion === 'solicitudes') {
       soloPendientes = true;
+    } else if (this.filtroPublicacion === 'publicadas') {
+      soloPublicadas = true;
     }
 
-    this.oSoaresService.getPageAdmin(this.numPage, this.numRpp, this.orderField, this.orderDirection, filter, soloPendientes).subscribe({
+    this.oSoaresService.getPageAdmin(this.numPage, this.numRpp, this.orderField, this.orderDirection, filter, soloPendientes, soloPublicadas).subscribe({
       next: (data: IPage<ISoares>) => {
-        // Client-side filtering for "publicadas" since backend doesn't support it in admin endpoint
-        if (this.filtroPublicacion === 'publicadas') {
-          data.content = data.content.filter(item => item.publicacion === true);
-        }
         this.oPage = data;
         this.rellenaOk = null;
         this.rellenaError = null;
@@ -142,25 +149,48 @@ export class SoaresRoutedAdminPlist {
     });
   }
 
-  onSearchChange(value: string) {
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-      this.searchTimeout = null;
+  /**
+   * Búsqueda con debounce de 350ms para evitar múltiples peticiones al servidor
+   */
+  onSearch(term: string) {
+    const trimmedTerm = term ? term.trim() : '';
+    
+    // Cancelar timer anterior si existe
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer);
     }
-    this.searchTimeout = setTimeout(() => {
-      this.searchTimeout = null;
-      this.numPage = 0;
+    
+    // Si el término es el mismo, no hacer nada
+    if (this.searchTerm === trimmedTerm) {
+      return false;
+    }
+    
+    this.searchTerm = trimmedTerm;
+    this.numPage = 0;
+    
+    // Aplicar debounce de 350ms
+    this.searchTimer = setTimeout(() => {
       this.getPage();
-    }, 500);
+    }, 350);
+    
+    return false;
   }
 
-  limpiarBusqueda() {
-    this.searchText = '';
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-    }
+  /**
+   * Ejecutar búsqueda inmediatamente (usado al presionar Enter)
+   */
+  onSearchImmediate(term: string) {
+    this.searchTerm = term ? term.trim() : '';
     this.numPage = 0;
+    
+    // Cancelar timer de debounce si existe
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer);
+      this.searchTimer = null;
+    }
+    
     this.getPage();
+    return false;
   }
 
   ordenar(field: string) {
@@ -189,6 +219,11 @@ export class SoaresRoutedAdminPlist {
   }
 
   confirmarVaciar() {
+    if (!this.oPage || !this.oPage.content || this.oPage.content.length === 0) {
+      this.mostrarToast('No hay preguntas para vaciar', 'error');
+      return;
+    }
+
     this.oSoaresService.empty().subscribe({
       next: () => {
         this.rellenaOk = null;
@@ -215,10 +250,18 @@ export class SoaresRoutedAdminPlist {
   }
 
   cerrarModalVer() {
-    this.itemToView = null;
-    this.modalToastMessage = null;
-    this.confirmandoEliminacion = false;
-    this.procesandoAccion = false;
+    // Quitar foco del elemento activo para evitar error de aria-hidden
+    const activeElement = document.activeElement as HTMLElement;
+    if (activeElement && activeElement.blur) {
+      activeElement.blur();
+    }
+    
+    setTimeout(() => {
+      this.itemToView = null;
+      this.modalToastMessage = null;
+      this.confirmandoEliminacion = false;
+      this.procesandoAccion = false;
+    }, 0);
   }
 
   togglePublicacionFromModal() {

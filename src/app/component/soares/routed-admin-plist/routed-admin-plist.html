@@ -22,7 +22,7 @@
                 <button class="btn btn-outline-primary btn-sm position-relative" [disabled]="rellenando"
                     (click)="generarFake()">
                     @if (rellenando) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span class="spinner-border spinner-border-sm me-2"></span>
                     } @if (!rellenando) {
                     <i class="bi bi-gear-fill me-2"></i>
                     } Generar
@@ -65,9 +65,16 @@
             </button>
         </div>
 
-        <input type="text" id="searchPreguntas" name="searchPreguntas" class="form-control form-control-sm"
-            placeholder="Buscar pregunta..." [(ngModel)]="searchText" (ngModelChange)="onSearchChange($event)"
-            style="max-width: 600px; flex: 1;">
+        <div class="position-relative" style="max-width: 600px; flex: 1;">
+            <input #searchBox type="search" id="searchPreguntas" name="searchPreguntas"
+                class="form-control form-control-sm" placeholder="Buscar pregunta..." aria-label="Buscar pregunta"
+                (input)="onSearch(searchBox.value)" (keyup.enter)="onSearchImmediate(searchBox.value)">
+            @if (searchTerm && searchTerm.length > 0) {
+            <span class="position-absolute top-50 end-0 translate-middle-y me-2 text-muted small">
+                <i class="bi bi-search"></i>
+            </span>
+            }
+        </div>
     </div>
 
     @if (oPage && oPage.content && oPage.content.length > 0) {
@@ -79,7 +86,7 @@
     </div>
     }
 
-    <div class="d-flex justify-content-center">
+    <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead class="table-light">
                 <tr>
@@ -117,7 +124,7 @@
                 </tr>
             </thead>
             <tbody>
-                @for (oSoares of oPage?.content; track oSoares.id ) {
+                @for (oSoares of oPage?.content; track oSoares.id) {
                 <tr>
                     <th scope="row">{{ oSoares.id }}</th>
                     <td>{{ oSoares.preguntas }}</td>
@@ -212,24 +219,26 @@
                 }
             </div>
             <div class="modal-footer d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cerrarModalVer()">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cerrarModalVer()"
+                    (mousedown)="$event.preventDefault()">
                     <i class="bi bi-x-circle me-2"></i>Cerrar
                 </button>
                 <div>
                     @if (itemToView && !confirmandoEliminacion) {
-                    <button type="button" class="btn btn-success me-2" (click)="togglePublicacionFromModal()"
-                        [disabled]="procesandoAccion">
-                        @if (procesandoAccion) {
-                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        }
-                        @if (!procesandoAccion) {
-                        @if (itemToView.publicacion) {
-                        <i class="bi bi-eye-slash me-2"></i>Despublicar
-                        } @else {
-                        <i class="bi bi-eye me-2"></i>Publicar
-                        }
-                        }
+                    @if (procesandoAccion) {
+                    <button type="button" class="btn btn-success me-2" disabled>
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Procesando...
                     </button>
+                    } @else if (itemToView.publicacion) {
+                    <button type="button" class="btn btn-success me-2" (click)="togglePublicacionFromModal()">
+                        <i class="bi bi-eye-slash me-2"></i>Despublicar
+                    </button>
+                    } @else {
+                    <button type="button" class="btn btn-success me-2" (click)="togglePublicacionFromModal()">
+                        <i class="bi bi-eye me-2"></i>Publicar
+                    </button>
+                    }
                     <a [routerLink]="['/soares/admin/edit', itemToView.id]" class="btn btn-warning me-2"
                         data-bs-dismiss="modal">
                         <i class="bi bi-pencil-square me-2"></i>Editar
@@ -247,7 +256,7 @@
                     <button type="button" class="btn btn-sm btn-danger" (click)="confirmarEliminarDesdeModal()"
                         [disabled]="procesandoAccion">
                         @if (procesandoAccion) {
-                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span class="spinner-border spinner-border-sm me-2"></span>
                         }
                         Sí, eliminar
                     </button>
@@ -274,10 +283,12 @@
                 <p class="text-muted small mt-2">Esta acción no se puede deshacer.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    (mousedown)="$event.preventDefault()">
                     <i class="bi bi-x-circle me-2"></i>Cancelar
                 </button>
-                <button type="button" class="btn btn-danger" (click)="confirmarEliminar()" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-danger" (click)="confirmarEliminar()" data-bs-dismiss="modal"
+                    (mousedown)="$event.preventDefault()">
                     <i class="bi bi-trash-fill me-2"></i>Eliminar
                 </button>
             </div>
@@ -302,10 +313,12 @@
                     datos y no se puede deshacer.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    (mousedown)="$event.preventDefault()">
                     <i class="bi bi-x-circle me-2"></i>Cancelar
                 </button>
-                <button type="button" class="btn btn-danger" (click)="confirmarVaciar()" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-danger" (click)="confirmarVaciar()" data-bs-dismiss="modal"
+                    (mousedown)="$event.preventDefault()">
                     <i class="bi bi-trash-fill me-2"></i>Vaciar Todo (Irreversible)
                 </button>
             </div>

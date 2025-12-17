@@ -37,10 +37,10 @@
                                 }
                             </div>
                             }
-                            @if (preguntas?.pending) {
+                            @if (preguntas?.pending && preguntas?.touched) {
                             <div class="form-text text-muted">
-                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                Verificando si la pregunta ya existe...
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                Verificando disponibilidad...
                             </div>
                             }
                         </div>
@@ -72,13 +72,12 @@
                 </div>
                 <div class="modal-body">
                     <p>¿Estás seguro de que deseas enviar esta solicitud de frase?</p>
-                    <p class="text-muted small mb-0">El administrador revisará tu pregunta antes de publicarla.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" (click)="confirmarEnvio()" [disabled]="submitting">
                         @if (submitting) {
-                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        <span class="spinner-border spinner-border-sm me-2"></span>
                         }
                         Confirmar
                     </button>

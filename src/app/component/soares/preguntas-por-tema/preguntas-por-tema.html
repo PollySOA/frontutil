@@ -10,7 +10,8 @@
             </p>
         </div>
     </div>
-    <div *ngFor="let tema of temas(); let i = index" class="tema-card mb-4 card-question">
+    @for (tema of temas(); track tema.tema; let i = $index) {
+    <div class="tema-card mb-4 card-question">
         <div class="card-header-question" (click)="toggleExpand(i)" style="cursor:pointer;">
             <strong>{{ tema.tema | titlecase }}</strong>
             <span class="badge bg-primary ms-2">{{ tema.preguntas.length }} preguntas</span>
@@ -18,13 +19,18 @@
                 <i class="bi" [class.bi-chevron-down]="!tema.expanded" [class.bi-chevron-up]="tema.expanded"></i>
             </span>
         </div>
-        <div *ngIf="tema.expanded" class="preguntas-list mt-2 animate-expand">
+        @if (tema.expanded) {
+        <div class="preguntas-list mt-2 animate-expand">
             <div class="mb-2 text-secondary">Aquí puedes ver todas las preguntas agrupadas por el tema seleccionado.
             </div>
-            <div *ngFor="let pregunta of tema.preguntas" class="pregunta-item border-bottom py-2">
+            @for (pregunta of tema.preguntas; track pregunta.id) {
+            <div class="pregunta-item border-bottom py-2">
                 <span class="fw-bold">{{ pregunta.preguntas }}</span>
                 <span class="text-muted ms-2">{{ pregunta.fechaCreacion }}</span>
             </div>
+            }
         </div>
+        }
     </div>
+    }
 </div>

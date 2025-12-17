@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ISoares } from '../../../model/soares';
+import { ISoares } from '../../../model/soares/soares';
 
 @Component({
   selector: 'app-unrouted-admin-view-soares',

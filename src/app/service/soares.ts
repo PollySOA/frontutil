@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { serverURL } from '../environment/environment';
 import { IPage } from '../model/plist';
-import { ISoares } from '../model/soares';
+import { ISoares } from '../model/soares/soares';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
@@ -14,7 +14,7 @@ export class SoaresService {
 
   constructor(private oHttp: HttpClient) { }
 
-  getPageAdmin(page: number, rpp: number, order: string = '', direction: string = '', filter: string = '', soloPendientes: boolean = false): Observable<IPage<ISoares>> {
+  getPageAdmin(page: number, rpp: number, order: string = '', direction: string = '', filter: string = '', soloPendientes: boolean = false, soloPublicadas: boolean = false): Observable<IPage<ISoares>> {
     if (order === '') {
       order = 'id';
     }
@@ -27,6 +27,9 @@ export class SoaresService {
     }
     if (soloPendientes) {
       sUrl += '&soloPendientes=true';
+    }
+    if (soloPublicadas) {
+      sUrl += '&soloPublicadas=true';
     }
     return this.oHttp.get<IPage<ISoares>>(sUrl);
   }

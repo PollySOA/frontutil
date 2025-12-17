@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IPage } from '../../../model/plist';
-import { ISoares } from '../../../model/soares';
+import { ISoares } from '../../../model/soares/soares';
 import { SoaresService } from '../../../service/soares';
 import { Paginacion } from "../../shared/paginacion/paginacion";
 import { UnroutedUserViewSoares } from "../unrouted-user-view/unrouted-user-view";

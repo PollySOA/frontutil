@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SoaresService } from '../../../service/soares';
-import { ISoares } from '../../../model/soares';
+import { ISoares } from '../../../model/soares/soares';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UnroutedAdminViewSoares } from "../unrouted-admin-view/unrouted-admin-view";
 
