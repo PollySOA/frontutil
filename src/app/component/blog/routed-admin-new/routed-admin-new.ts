@@ -4,10 +4,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { BlogService } from '../../../service/blog';
 import { IBlog } from '../../../model/blog';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-routed-admin-new',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, MatDialogModule, MatSnackBarModule],
   templateUrl: './routed-admin-new.html',
   styleUrl: './routed-admin-new.css',
 })
@@ -15,6 +18,8 @@ export class RoutedAdminNew implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private blogService = inject(BlogService);
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
 
   blogForm!: FormGroup;
   error: string | null = null;
@@ -61,14 +66,35 @@ export class RoutedAdminNew implements OnInit {
     this.blogService.create(payload).subscribe({
       next: () => {
         this.submitting = false;
+        // mark form as pristine so canDeactivate guard won't ask confirmation
+        if (this.blogForm) {
+          this.blogForm.markAsPristine();
+        }
+        // inform the user
+        this.snackBar.open('Post creado correctamente', 'Cerrar', { duration: 3000 });
         this.router.navigate(['/blog/plist']);
       },
       error: (err: HttpErrorResponse) => {
         this.submitting = false;
         this.error = 'Error al crear el post';
+        this.snackBar.open('Error al crear el post', 'Cerrar', { duration: 4000 });
         console.error(err);
       },
     });
+  }
+
+  // Guard: ask confirmation if the form has unsaved changes
+  canDeactivate(): boolean | Promise<boolean> | import("rxjs").Observable<boolean> {
+    if (!this.blogForm || !this.blogForm.dirty) {
+      return true;
+    }
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Cambios sin guardar',
+        message: 'Hay cambios sin guardar. ¿Desea salir sin guardar los cambios?'
+      }
+    });
+    return ref.afterClosed();
   }
 
   get titulo() {

@@ -158,6 +158,7 @@ import { RoutedAdminEditZanon } from './component/zanon/routed-admin-edit/routed
 import { RoutedAdminNewZanon } from './component/zanon/routed-admin-new/routed-admin-new';
 import { RoutedAdminRemoveZanon } from './component/zanon/routed-admin-remove/routed-admin-remove';
 import { AdminGuard } from './guards/admin.guard';
+import { PendingChangesGuard } from './guards/pending-changes.guard';
 //
 export const routes: Routes = [
   { path: '', component: Home },
@@ -168,8 +169,8 @@ export const routes: Routes = [
   { path: 'blog/post/:id', component: RoutedUserView },
   { path: 'blog/plist', component: RoutedAdminPlist, canActivate: [AdminGuard] },
   { path: 'blog/view/:id', component: RoutedAdminView, canActivate: [AdminGuard] },
-  { path: 'blog/new', component: RoutedAdminNew, canActivate: [AdminGuard] },
-  { path: 'blog/edit/:id', component: RoutedAdminEdit, canActivate: [AdminGuard] },
+  { path: 'blog/new', component: RoutedAdminNew, canActivate: [AdminGuard], canDeactivate: [PendingChangesGuard] },
+  { path: 'blog/edit/:id', component: RoutedAdminEdit, canActivate: [AdminGuard], canDeactivate: [PendingChangesGuard] },
   { path: 'blog/remove/:id', component: RoutedAdminRemove, canActivate: [AdminGuard] },
   //
   { path: 'recurso', component: RoutedUserPlistPavon },

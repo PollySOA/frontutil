@@ -42,6 +42,14 @@ export class BlogService {
     return this.oHttp.get<number>(serverURL + '/blog/rellena/' + numPosts);
   }
 
+  /**
+   * Vaciar la tabla de blog (DELETE /blog/empty)
+   * Devuelve el número de filas eliminadas
+   */
+  empty(): Observable<number> {
+    return this.oHttp.delete<number>(serverURL + '/blog/empty');
+  }
+
   publicar(id: number): Observable<number> {
     return this.oHttp.put<number>(serverURL + '/blog/publicar/' + id, {});
   }
