@@ -82,4 +82,49 @@ export class RoutedAdminPlistGarcia {
       }
     });
   }
+
+  publicar(id: number) {
+    this.oGarciaService.publicar(id).subscribe({
+      next: () => {
+        this.getPage();
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Error al publicar:', err);
+      }
+    });
+  }
+
+  despublicar(id: number) {
+    this.oGarciaService.despublicar(id).subscribe({
+      next: () => {
+        this.getPage();
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Error al despublicar:', err);
+      }
+    });
+  }
+
+  borrarTodos() {
+    if (confirm('⚠️ ¿Estás seguro de que quieres borrar TODOS los objetivos? Esta acción no se puede deshacer.')) {
+      this.rellenando = true;
+      this.rellenaOk = null;
+      this.rellenaError = null;
+
+      this.oGarciaService.deleteAll().subscribe({
+        next: (count: number) => {
+          this.rellenando = false;
+          this.rellenaOk = null;
+          this.rellenaError = null;
+          alert(`✅ Se han borrado ${count} objetivos correctamente`);
+          this.getPage();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.rellenando = false;
+          this.rellenaError = 'Error al borrar los objetivos';
+          console.error(err);
+        }
+      });
+    }
+  }
 }
