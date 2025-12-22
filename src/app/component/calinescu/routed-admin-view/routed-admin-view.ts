@@ -4,6 +4,7 @@ import { CalinescuService } from '../../../service/calinescu.service';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UnroutedAdminViewCalinescu } from "../unrouted-admin-view/unrouted-admin-view";
+import { debug } from '../../../environment/environment';
 
 /**
  * Componente para visualizar los detalles de un item de la lista de compras (vista admin).
@@ -25,7 +26,7 @@ export class RoutedAdminViewCalinescu {
     const idParam = this.route.snapshot.paramMap.get('id');
     const id = idParam ? Number(idParam) : NaN;
     if (isNaN(id)) {
-      console.error('Invalid id:', idParam);
+      if (debug) console.error('Invalid id:', idParam);
       return;
     }
     this.getCalinescu(id);
@@ -44,7 +45,7 @@ export class RoutedAdminViewCalinescu {
         this.oCalinescu = data;
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Error fetching item:', error);
+        if (debug) console.error('Error fetching item:', error);
       },
     });
   }

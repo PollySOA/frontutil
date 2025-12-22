@@ -5,11 +5,12 @@ import { Paginacion } from "../../shared/paginacion/paginacion";
 import { ISalinasReceta } from '../../../model/salinas-receta';
 import { SalinasService } from '../../../service/salinas-receta';
 import { SalinasUnroutedUserView2 } from '../unrouted-user-view2/unrouted-user-view2';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-salinas-routed-user-plist',
-  imports: [Paginacion, SalinasUnroutedUserView2],
+  imports: [CommonModule,Paginacion, SalinasUnroutedUserView2],
   templateUrl: './routed-user-plist.html',
   styleUrl: './routed-user-plist.css',
 })
@@ -17,7 +18,7 @@ export class SalinasRoutedUserPlist {
   oPage: IPage<ISalinasReceta> | null = null;
   numPage: number = 0;
   numRpp: number = 2;
-
+  totalElementsCount: number = 0;
   constructor(private oSalinasService: SalinasService) { }
 
   oBotonera: string[] = [];
@@ -30,6 +31,7 @@ export class SalinasRoutedUserPlist {
     this.oSalinasService.getPage(this.numPage, this.numRpp, 'fechaCreacion', 'desc').subscribe({
       next: (data: IPage<ISalinasReceta>) => {
         this.oPage = data;
+        this.totalElementsCount = data.totalElements ?? 0;
         // OJO! si estamos en una página que supera el límite entonces nos situamos en la ultima disponible
         if (this.numPage > 0 && this.numPage >= data.totalPages) {
           this.numPage = data.totalPages - 1;

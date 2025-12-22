@@ -1,6 +1,10 @@
 <div class="front-view-post d-flex flex-column flex-md-row align-items-start">
   <div class="thumb me-3" aria-hidden>
+    @if (oSilvestre?.urlImagen) {
+    <img [src]="oSilvestre?.urlImagen" alt="{{ oSilvestre?.titulo }}" class="img-fluid rounded" />
+    } @else {
     <i [class]="iconClass" aria-hidden="true"></i>
+    }
   </div>
   <div class="content flex-fill">
     <h1 class="title">{{ oSilvestre?.titulo }}</h1>
@@ -15,7 +19,13 @@
       </small>
     </div>
     <div class="d-flex justify-content-end">
-      <small class="text-muted me-3">Url de imagen: {{ oSilvestre?.urlImagen }}</small>
+      <small class="text-muted me-3">Url de imagen:
+        @if (oSilvestre?.urlImagen) {
+        <a [href]="oSilvestre?.urlImagen" target="_blank" rel="noopener noreferrer">{{ oSilvestre?.urlImagen }}</a>
+        } @else {
+        <span class="text-muted">Sin URL</span>
+        }
+      </small>
     </div>
     
   </div>

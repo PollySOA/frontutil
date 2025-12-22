@@ -30,3 +30,17 @@ select.form-select.form-select-sm { min-width: 110px; }
 /* Slim buttons for admin toolbar */
 .maintenance-btn-admin { padding: .22rem .5rem; font-size: 0.85rem; line-height:1; border-radius:.35rem; }
 .maintenance-btn-admin .bi { font-size: 0.95rem; }
+
+/* Sortable header styles */
+.sortable-header {
+	cursor: pointer;
+	user-select: none;
+	white-space: nowrap;
+}
+.sortable-header:hover {
+	background-color: rgba(0,0,0,0.05);
+}
+.sortable-header .bi {
+	margin-left: 0.25rem;
+	font-size: 0.85rem;
+}

@@ -28,10 +28,9 @@ export class RoutedUserPlistGarcia {
   }
 
   getPage() {
-    this.oGarciaService.getPage(this.numPage, this.numRpp, 'fechaInicio', 'desc').subscribe({
+    this.oGarciaService.getPagePublico(this.numPage, this.numRpp).subscribe({
       next: (data: IPage<IGarcia>) => {
         this.oPage = data;
-        // OJO! si estamos en una página que supera el límite entonces nos situamos en la ultima disponible
         if (this.numPage > 0 && this.numPage >= data.totalPages) {
           this.numPage = data.totalPages - 1;
           this.getPage();

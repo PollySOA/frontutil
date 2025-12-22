@@ -51,7 +51,7 @@ export class RoutedAdminRemovePavon implements OnInit {
     this.pavonService.delete(this.oRecurso.id).subscribe({
       next: () => {
         this.deleting = false;
-        this.router.navigate(['/recurso/plist']);
+        this.router.navigate(['/recurso/plist'], { queryParams: { msg: 'Recurso borrado correctamente' } });
       },
       error: (err: HttpErrorResponse) => {
         this.deleting = false;

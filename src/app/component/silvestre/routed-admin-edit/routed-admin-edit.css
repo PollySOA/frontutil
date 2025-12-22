@@ -31,36 +31,4 @@ input.form-control, textarea.form-control{
 .is-invalid{ border-color:#dc3545 !important; }
 .is-valid{ border-color:#198754 !important; }
 
-/* Botón bonito en tonos pastel rosa */
-button.btn-primary{
-  border-radius: 10px;
-  background: linear-gradient(180deg, #c79ca5 0%, #eec9cf 55%, #fff6f7 100%);
-  border: 1px solid rgba(199,156,165,0.18);
-  color: #ffffff;
-  padding: .5rem .95rem;
-  font-weight: 600;
-  box-shadow: 0 8px 20px rgba(27, 26, 26, 0.12), inset 0 1px 0 rgba(255,255,255,0.35);
-  transition: transform .14s ease, box-shadow .14s ease, filter .14s ease;
-}
 
-/* estados */
-button.btn-primary:hover{
-  transform: translateY(-3px);
-  filter: brightness(1.03);
-  box-shadow: 0 14px 34px rgba(199,156,165,0.16);
-}
-
-button.btn-primary:active{
-  transform: translateY(0);
-}
-
-button.btn-primary:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 4px rgba(199,156,165,0.12);
-}
-
-button.btn-primary:disabled{
-  opacity: .72;
-  cursor: not-allowed;
-  filter: grayscale(.05) contrast(.95);
-}

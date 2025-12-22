@@ -1,14 +1,98 @@
 <div class="container my-2">
   <div class="d-flex justify-content-center my-3">
-    <h1>Mantenimiento de Recursos</h1>
+    <h1>Mantenimiento del Recurso</h1>
+  </div>
+
+  <!-- Sólo mostrar las botoneras superiores si hay registros -->
+  @if (totalRecords > 0) {
+  <div class="d-flex justify-content-center my-3 gap-2">
+    <a [routerLink]="['/recurso/new']" class="btn btn-success btn-sm">
+      <i class="bi bi-plus-circle me-2"></i>Crear un nuevo Post
+    </a>
+    <a [routerLink]="['/recurso']" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-eye me-2"></i>Ver Recurso Público
+    </a>
+  </div>
+  }
+
+  <!-- Aviso (mensaje desde queryParams) -->
+  @if (message) {
+  <div class="d-flex justify-content-center my-2">
+    <div class="alert alert-success w-100 text-center" role="alert">
+      {{ message }}
+    </div>
+  </div>
+  }
+
+  <!-- Total registros -->
+  <div class="d-flex justify-content-center my-1">
+    <small class="text-muted">Total registros: {{ totalRecords || 0 }}</small>
   </div>
 
   <div class="d-flex justify-content-center my-3">
-    <a [routerLink]="['/recurso/new']" class="btn btn-success btn-sm">
-      <i class="bi bi-plus-circle me-2"></i>Crear un nuevo Recurso
-    </a>
+    <div class="card shadow-sm p-3 w-100" style="max-width: 720px">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <label for="rellenaSelect" class="form-label m-0 fw-semibold"
+          >Generar datos de prueba:</label
+        >
+        <select
+          #cantidadSel
+          id="rellenaSelect"
+          class="form-select form-select-sm w-auto"
+          (change)="onCantidadChange(cantidadSel.value)"
+        >
+          <option [selected]="rellenaCantidad === 10" value="10">10</option>
+          <option [selected]="rellenaCantidad === 100" value="100">100</option>
+          <option [selected]="rellenaCantidad === 1000" value="1000">1000</option>
+        </select>
+        <button
+          class="btn btn-outline-primary btn-sm position-relative"
+          [disabled]="rellenando"
+          (click)="generarFake()"
+        >
+          @if (rellenando) {
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          } @if (!rellenando) {
+          <i class="bi bi-gear-fill me-2"></i>
+          } Generar
+        </button>
+
+        <button
+          class="btn btn-danger btn-sm position-relative"
+          [disabled]="emptying"
+          (click)="openEmptyConfirm()"
+          title="Vaciar tabla"
+        >
+          @if (emptying) {
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          } @if (!emptying) {
+          <i class="bi bi-trash me-2"></i>
+          } Vaciar tabla
+        </button>
+
+        @if (rellenaOk) {
+        <div class="text-success small d-flex align-items-center">
+          <i class="bi bi-check-circle me-1"></i>{{ rellenaOk }} posts
+        </div>
+        } @if (rellenaError) {
+        <div class="text-danger small d-flex align-items-center">
+          <i class="bi bi-exclamation-triangle me-1"></i>{{ rellenaError }}
+        </div>
+        }
+      </div>
+    </div>
   </div>
 
+  <!-- Ocultar paginación y RPP si no hay registros -->
+  @if (totalRecords > 0) {
   <div class="d-flex justify-content-between my-1">
     <app-paginacion
       [numPage]="numPage"
@@ -19,17 +103,68 @@
 
     <app-botonera-rpp [numRpp]="numRpp" (rppChange)="onRppChange($event)"> </app-botonera-rpp>
   </div>
+  }
 
   <div class="d-flex justify-content-center">
     <table class="table table-striped table-bordered">
       <thead>
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">URL</th>
-          <th scope="col">Público</th>
-          <th scope="col">Creación</th>
-          <th scope="col">Actualización</th>
+          <th scope="col" (click)="onOrder('id')" style="cursor:pointer; width:5%">
+            <span class="header-inline">ID
+              @if (orderField === 'id') {
+                @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1" aria-hidden="true"></i>
+                } @if (orderDirection === 'desc') {
+                  <i class="bi bi-caret-down-fill ms-1" aria-hidden="true"></i>
+                }
+              }
+            </span>
+          </th>
+          <th scope="col" (click)="onOrder('nombre')" style="cursor:pointer; width:35%">
+            <span class="header-inline">Nombre
+              @if (orderField === 'nombre') {
+                @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1" aria-hidden="true"></i>
+                } @if (orderDirection === 'desc') {
+                  <i class="bi bi-caret-down-fill ms-1" aria-hidden="true"></i>
+                }
+              }
+            </span>
+          </th>
+          <th scope="col" style="width:20%">URL</th>
+          <th scope="col" (click)="onOrder('publico')" style="cursor:pointer; width:10%">
+            <span class="header-inline">Público
+              @if (orderField === 'publico') {
+                @if (orderDirection === 'asc') {
+                    <i class="bi bi-caret-up-fill ms-1" aria-hidden="true"></i>
+                } @if (orderDirection === 'desc') {
+                    <i class="bi bi-caret-down-fill ms-1" aria-hidden="true"></i>
+                }
+              }
+            </span>
+          </th>
+          <th scope="col" (click)="onOrder('fechaCreacion')" style="cursor:pointer; width:15%">
+            <span class="header-inline">Creación
+              @if (orderField === 'fechaCreacion') {
+                @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1"></i>
+                } @if (orderDirection === 'desc') {
+                  <i class="bi bi-caret-down-fill ms-1"></i>
+                }
+              }
+            </span>
+          </th>
+          <th scope="col" (click)="onOrder('fechaModificacion')" style="cursor:pointer; width:10%">
+            <span class="header-inline">Actualización
+              @if (orderField === 'fechaModificacion') {
+                @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1" aria-hidden="true"></i>
+                } @if (orderDirection === 'desc') {
+                  <i class="bi bi-caret-down-fill ms-1" aria-hidden="true"></i>
+                }
+              }
+            </span>
+          </th>
           <th scope="col">Operaciones</th>
         </tr>
       </thead>
@@ -39,11 +174,15 @@
           <th scope="row">{{ oRecurso.id }}</th>
           <td>{{ oRecurso.nombre }}</td>
           <td>{{ oRecurso.url }}</td>
-          <td>
+          <td class="text-center align-middle">
             @if (oRecurso.publico) {
-              <i class="bi bi-check-circle text-success"></i>
-            } @else {
-              <i class="bi bi-x-circle text-danger"></i>
+            <span class="text-success d-inline-flex align-items-center">
+              <i class="bi bi-check-circle-fill me-1"></i>
+            </span>
+            } @if (!oRecurso.publico) {
+            <span class="text-secondary d-inline-flex align-items-center">
+              <i class="bi bi-x-circle-fill me-1"></i>
+            </span>
             }
           </td>
           <td>{{ oRecurso.fechaCreacion | datetime }}</td>
@@ -56,6 +195,42 @@
               <a [routerLink]="['/recurso/edit', oRecurso.id]" class="btn btn-outline-secondary">
                 <i class="bi bi-pencil-square"></i>
               </a>
+              @if (!oRecurso.publico) {
+              <button
+                class="btn btn-outline-success"
+                title="Publicar"
+                [disabled]="publishingId === oRecurso.id"
+                (click)="publicar(oRecurso.id)"
+              >
+                @if (publishingId === oRecurso.id && publishingAction === 'publicar') {
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                } @if (!(publishingId === oRecurso.id && publishingAction === 'publicar')) {
+                <i class="bi bi-upload"></i>
+                }
+              </button>
+              } @if (oRecurso.publico) {
+              <button
+                class="btn btn-outline-danger"
+                title="Despublicar"
+                [disabled]="publishingId === oRecurso.id"
+                (click)="despublicar(oRecurso.id)"
+              >
+                @if (publishingId === oRecurso.id && publishingAction === 'despublicar') {
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                } @if (!(publishingId === oRecurso.id && publishingAction === 'despublicar')) {
+                <i class="bi bi-eye-slash"></i>
+                }
+              </button>
+              }
+
               <a [routerLink]="['/recurso/remove', oRecurso.id]" class="btn btn-outline-danger">
                 <i class="bi bi-trash"></i>
               </a>

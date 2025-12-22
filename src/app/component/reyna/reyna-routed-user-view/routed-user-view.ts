@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UnroutedUserView} from "../reyna-unrouted-user-view/unrouted-user-view";
 import { IReyna } from '../../../model/reyna';
-import { ReynaService } from '../../../service/reyna';
+import { ReynaService } from '../../../service/reyna/reyna';
 
 @Component({
   selector: 'app-routed-user-view',

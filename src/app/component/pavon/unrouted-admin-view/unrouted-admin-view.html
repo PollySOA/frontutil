@@ -1,45 +1,42 @@
 <!-- crear la tabla con oRecurso -->
-<div class="container my-4 edit-form">
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
-      <div class="form-card">
-        <h1 class="my-5">Detalle de recurso</h1>
-
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="row">{{ oRecurso?.id }}</th>
-            </tr>
-            <tr>
-              <th scope="col">Nombre</th>
-              <td>{{ oRecurso?.nombre }}</td>
-            </tr>
-            <tr>
-              <th scope="col" class="align-middle">URL</th>
-              <td><a [href]="oRecurso?.url" target="_blank">{{ oRecurso?.url }}</a></td>
-            </tr>
-            <tr>
-              <th scope="col">Público</th>
-              <td>
-                @if (oRecurso?.publico) {
-                  <i class="bi bi-check-circle text-success"></i> Sí
-                } @else {
-                  <i class="bi bi-x-circle text-danger"></i> No
-                }
-              </td>
-            </tr>
-            <tr>
-              <th scope="col">Creación</th>
-              <td>{{ oRecurso?.fechaCreacion }}</td>
-            </tr>
-            <tr>
-              <th scope="col">Actualización</th>
-              <td>{{ oRecurso?.fechaModificacion }}</td>
-            </tr>
-          </thead>
-        </table>
-      </div>
+<div class="blog-view-card">
+  <div class="card-header">
+    <h2 class="card-title">Detalles del Post</h2>
+  </div>
+  <div class="card-body">
+    <div class="detail-row">
+      <span class="detail-label">ID</span>
+      <span class="detail-value">{{ oRecurso?.id }}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Título</span>
+      <span class="detail-value">{{ oRecurso?.nombre }}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Contenido</span>
+      <span class="detail-value content-preview">{{ oRecurso?.url }}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Estado</span>
+      <span class="detail-value">
+        @if (oRecurso?.publico) {
+          <span class="badge bg-success">
+            <i class="bi bi-check-circle-fill me-1"></i>Publicado
+          </span>
+        } @else {
+          <span class="badge bg-secondary">
+            <i class="bi bi-x-circle-fill me-1"></i>No publicado
+          </span>
+        }
+      </span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Creación</span>
+      <span class="detail-value">{{ oRecurso?.fechaCreacion }}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Actualización</span>
+      <span class="detail-value">{{ oRecurso?.fechaModificacion }}</span>
     </div>
   </div>
 </div>

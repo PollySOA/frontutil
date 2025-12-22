@@ -14,6 +14,17 @@
 	background:#f8f9fa;
 	color:#111;
 }
+
+/* Make images match the icon size and style */
+.front-view-post .thumb img{
+	width:200px;
+	height:200px;
+	display:block;
+	object-fit:cover;
+	border-radius:8px;
+	border:1px solid rgba(0,0,0,0.06);
+	background:#f8f9fa;
+}
 .front-view-post .title{
 	margin:0 0 0.25rem 0;
 	font-size:1.7rem;

@@ -43,4 +43,16 @@ export class SalinasService {
     // Asume que el backend tiene el endpoint /receta/populate/{amount}
     return this.oHttp.post<number>(serverURL + '/receta/populate/' + amount, null);
   }
+
+  empty(): Observable<number> {
+    return this.oHttp.delete<number>(serverURL + '/receta/empty');
+  }
+
+  publicar(id: number): Observable<number> {
+    return this.oHttp.put<number>(serverURL + '/receta/publicar/' + id, {});
+  }
+
+  despublicar(id: number): Observable<number> {
+    return this.oHttp.put<number>(serverURL + '/receta/despublicar/' + id, {});
+  }
 }

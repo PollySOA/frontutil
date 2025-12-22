@@ -28,7 +28,13 @@
         }
       </div>
       <div class="post-meta text-muted small">
-        <span class="tags"><i class="bi bi-tags"></i> {{ oSilvestre?.urlImagen }}</span>
+        <span class="tags"><i class="bi bi-tags"></i>
+          @if (oSilvestre?.urlImagen) {
+          <a [href]="oSilvestre?.urlImagen" target="_blank" rel="noopener noreferrer">{{ oSilvestre?.urlImagen }}</a>
+          } @else {
+          <span class="text-muted">Sin URL</span>
+          }
+        </span>
       </div>
     </footer>
   </article>

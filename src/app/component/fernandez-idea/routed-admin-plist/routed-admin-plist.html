@@ -12,6 +12,19 @@
         <button class="btn btn-outline-info btn-sm ms-2" (click)="requestBulkCreate(+bulkAmountInput.value)">
           <i class="bi bi-lightning me-2"></i>Generar ideas fake
         </button>
+        <button 
+          class="btn btn-danger btn-sm ms-2" 
+          [disabled]="isEmptying"
+          (click)="requestEmptyTable()"
+          title="Vaciar tabla"
+        >
+          @if (isEmptying) {
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          } @else {
+            <i class="bi bi-trash me-2"></i>
+          }
+          Vaciar tabla
+        </button>
       </div>
       <!-- Inline warning card for very large bulk requests -->
       @if (showBulkWarning) {
@@ -55,40 +68,137 @@
           </div>
         </div>
       }
+
+      @if (showEmptyWarning) {
+        <!-- Modal de confirmación para vaciar tabla -->
+        <div class="modal-backdrop fade show"></div>
+        <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="emptyWarningTitle">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="emptyWarningTitle">Vaciar tabla de Ideas</h5>
+                <button type="button" class="btn-close" aria-label="Cerrar" (click)="cancelEmptyTable()"></button>
+              </div>
+              <div class="modal-body">
+                <p>¿Estás seguro de que deseas <strong>eliminar TODAS las ideas</strong>?</p>
+                <p class="text-danger mb-0"><i class="bi bi-exclamation-triangle me-1"></i>Esta acción es irreversible.</p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-danger" (click)="emptyTable()">Sí, vaciar tabla</button>
+                <button class="btn btn-secondary" (click)="cancelEmptyTable()">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (isEmptying) {
+        <!-- Loading modal para vaciar -->
+        <div class="modal-backdrop fade show"></div>
+        <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="emptyLoadingTitle">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                  <div class="spinner-border text-danger" role="status" aria-hidden="true"></div>
+                </div>
+                <h5 id="emptyLoadingTitle">Vaciando tabla</h5>
+                <p class="mb-0">Por favor espera hasta que termine la eliminación de todos los registros.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
   </div>
 
+  @if (infoMessage) {
+    <div class="alert alert-success" role="status">{{ infoMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+  }
 
   <div class="d-flex justify-content-between align-items-center my-3 toolbar-grid">
     <div class="toolbar-left d-flex gap-2 align-items-center">
-      <input #searchBox type="search" class="form-control form-control-sm" placeholder="Buscar ideas..." aria-label="Buscar ideas" (input)="onSearch(searchBox.value)" (keyup.enter)="onSearchImmediate(searchBox.value)" />
+      <input type="search" class="form-control form-control-sm" placeholder="Buscar ideas..." aria-label="Buscar ideas" [(ngModel)]="searchTerm" (input)="onSearchDebounce()" (keyup.enter)="onSearchImmediate()" />
+      <select class="form-select form-select-sm" [(ngModel)]="categoriaFilter" (change)="onCategoriaChange()" aria-label="Filtrar por categoría" style="width: auto;">
+        <option value="ALL">Todas las categorías</option>
+        <option value="IDEA">IDEA</option>
+        <option value="MEJORA">MEJORA</option>
+        <option value="BUG">BUG</option>
+      </select>
     </div>
 
     <div class="toolbar-center d-flex justify-content-center align-items-center">
-      <app-paginacion
-        [numPage]="numPage"
-        [numPages]="oPage?.totalPages || 1"
-        (pageChange)="goToPage($event)"
-      ></app-paginacion>
+      @if ((oPage?.totalElements ?? 0) > 0) {
+        <app-paginacion
+          [numPage]="numPage"
+          [numPages]="oPage?.totalPages || 1"
+          (pageChange)="goToPage($event)"
+        ></app-paginacion>
+      }
     </div>
 
     <div class="toolbar-right d-flex align-items-center justify-content-end gap-2">
-      <app-botonera-rpp [numRpp]="numRpp" (rppChange)="onRppChange($event)"> </app-botonera-rpp>
+      @if (totalRecordsAll > 0) {
+        <app-botonera-rpp [numRpp]="numRpp" (rppChange)="onRppChange($event)"> </app-botonera-rpp>
+      }
       <a [routerLink]="['/fernandez-idea/user/plist']" class="btn btn-outline-primary btn-sm ms-2 maintenance-btn-admin">
         <i class="bi bi-globe me-1"></i>Ver versión pública
       </a>
     </div>
   </div>
 
-  <div class="d-flex justify-content-center">
+  <div class="d-flex justify-content-end">
+    <small class="text-muted">
+      @if (searchTerm || (categoriaFilter !== 'ALL')) {
+        Mostrando <strong>{{ totalRecordsFiltered }}</strong> resultados (filtrados) de <strong>{{ totalRecordsAll }}</strong> ideas (totales).
+      } @else if (totalRecordsAll > 0) {
+        Total de ideas: <strong>{{ totalRecordsAll }}</strong>
+      }
+    </small>
+  </div>
+
+  <div class="d-flex justify-content-center table-responsive">
     <table class="table table-striped table-bordered">
       <thead>
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Título</th>
-          <th scope="col">Categoría</th>
-          <th scope="col">Público</th>
-          <th scope="col">Creación</th>
-          <th scope="col">Modificación</th>
+          <th scope="col" class="sortable-header" style="cursor: pointer;" (click)="onHeaderSort('id')">
+            ID
+            @if (orderField === 'id') {
+              <i class="bi" [class.bi-sort-up]="orderDirection === 'asc'" [class.bi-sort-down]="orderDirection === 'desc'"></i>
+            }
+          </th>
+          <th scope="col" class="sortable-header" style="cursor: pointer;" (click)="onHeaderSort('titulo')">
+            Título
+            @if (orderField === 'titulo') {
+              <i class="bi" [class.bi-sort-up]="orderDirection === 'asc'" [class.bi-sort-down]="orderDirection === 'desc'"></i>
+            }
+          </th>
+          <th scope="col" class="sortable-header" style="cursor: pointer;" (click)="onHeaderSort('categoria')">
+            Categoría
+            @if (orderField === 'categoria') {
+              <i class="bi" [class.bi-sort-up]="orderDirection === 'asc'" [class.bi-sort-down]="orderDirection === 'desc'"></i>
+            }
+          </th>
+          <th scope="col" class="sortable-header" style="cursor: pointer;" (click)="onHeaderSort('publico')">
+            Publicado
+            @if (orderField === 'publico') {
+              <i class="bi" [class.bi-sort-up]="orderDirection === 'asc'" [class.bi-sort-down]="orderDirection === 'desc'"></i>
+            }
+          </th>
+          <th scope="col" class="sortable-header" style="cursor: pointer;" (click)="onHeaderSort('fechaCreacion')">
+            Creación
+            @if (orderField === 'fechaCreacion') {
+              <i class="bi" [class.bi-sort-up]="orderDirection === 'asc'" [class.bi-sort-down]="orderDirection === 'desc'"></i>
+            }
+          </th>
+          <th scope="col" class="sortable-header" style="cursor: pointer;" (click)="onHeaderSort('fechaModificacion')">
+            Modificación
+            @if (orderField === 'fechaModificacion') {
+              <i class="bi" [class.bi-sort-up]="orderDirection === 'asc'" [class.bi-sort-down]="orderDirection === 'desc'"></i>
+            }
+          </th>
           <th scope="col">Operaciones</th>
         </tr>
       </thead>
@@ -107,15 +217,24 @@
           </td>
           <td>
             @if (oIdea.publico) {
-              <i class="bi bi-check-circle-fill text-success"></i>
+              <i class="bi bi-check-circle-fill text-success" title="Publicado"></i>
             } @else {
-              <i class="bi bi-x-circle-fill text-danger"></i>
+              <i class="bi bi-x-circle-fill text-danger" title="No publicado"></i>
             }
           </td>
-          <td>{{ oIdea.fechaCreacion }}</td>
-          <td>{{ oIdea.fechaModificacion }}</td>
+          <td>{{ oIdea.fechaCreacion | datetime:'solofechacompleta' }}</td>
+          <td>{{ oIdea.fechaModificacion | datetime:'solofechacompleta' }}</td>
           <td>
             <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
+              @if (oIdea.publico) {
+                <button class="btn btn-outline-warning" type="button" title="Despublicar" (click)="togglePublic(oIdea)">
+                  <i class="bi bi-unlock"></i>
+                </button>
+              } @else {
+                <button class="btn btn-outline-success" type="button" title="Publicar" (click)="togglePublic(oIdea)">
+                  <i class="bi bi-lock"></i>
+                </button>
+              }
               <a [routerLink]="['/fernandez-idea/admin/view', oIdea.id]" class="btn btn-outline-primary">
                 <i class="bi bi-eye"></i>
               </a>
@@ -132,4 +251,10 @@
       </tbody>
     </table>
   </div>
+
+  @if (oPage && oPage.content && oPage.content.length === 0) {
+    <div class="alert alert-info text-center" role="alert">
+      No hay ideas que mostrar con los filtros actuales.
+    </div>
+  }
 </div>

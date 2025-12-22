@@ -7,9 +7,9 @@ import { MatButtonModule } from '@angular/material/button';
   standalone: true,
   imports: [MatDialogModule, MatButtonModule],
   template: `
-    <h2 mat-dialog-title>{{ data?.title || 'Confirmar' }}</h2>
+    <h2 mat-dialog-title>{{ data.title || 'Confirmar' }}</h2>
     <mat-dialog-content>
-      <p>{{ data?.message || '¿Confirmar la acción?' }}</p>
+      <p>{{ data.message || '¿Confirmar la acción?' }}</p>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button (click)="onCancel()">Cancelar</button>

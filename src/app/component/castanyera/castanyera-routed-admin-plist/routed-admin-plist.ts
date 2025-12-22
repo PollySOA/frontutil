@@ -4,9 +4,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { IPage } from '../../../model/plist';
 import { ICastanyera } from '../../../model/castanyera';
 import { CastanyeraService } from '../../../service/castanyera';
-import { Paginacion } from "../../shared/paginacion/paginacion";
-import { BotoneraRpp } from "../../shared/botonera-rpp/botonera-rpp";
-import { DatetimePipe } from "../../../pipe/datetime-pipe";
+import { Paginacion } from '../../shared/paginacion/paginacion';
+import { BotoneraRpp } from '../../shared/botonera-rpp/botonera-rpp';
+import { DatetimePipe } from '../../../pipe/datetime-pipe';
 
 @Component({
   selector: 'castanyera-app-routed-admin-plist',
@@ -22,34 +22,52 @@ export class CastanyeraRoutedAdminPlist {
   rellenando: boolean = false;
   rellenaOk: number | null = null;
   rellenaError: string | null = null;
+  publishingId: number | null = null;
+  publishingAction: 'publicar' | 'despublicar' | null = null;
 
-  constructor(private oCastanyeraService: CastanyeraService) { }
+  constructor(private oCastanyeraService: CastanyeraService) {}
 
   oBotonera: string[] = [];
+  orderField: string = 'id';
+  orderDirection: string = 'asc';
 
   ngOnInit() {
     this.getPage();
   }
 
   getPage() {
-    this.oCastanyeraService.getPage(this.numPage, this.numRpp).subscribe({
-      next: (data: IPage<ICastanyera>) => {
-        this.oPage = data;
-        this.rellenaOk = this.oPage.totalElements;
-        // si estamos en una página que supera el límite entonces nos situamos en la ultima disponible
-        if (this.numPage > 0 && this.numPage >= data.totalPages) {
-          this.numPage = data.totalPages - 1;
-          this.getPage();
-        }
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error(error);
-      },
-    });
+    this.oCastanyeraService
+      .getPage(this.numPage, this.numRpp, this.orderField, this.orderDirection)
+      .subscribe({
+        next: (data: IPage<ICastanyera>) => {
+          this.oPage = data;
+          this.rellenaOk = this.oPage.totalElements;
+          // si estamos en una página que supera el límite entonces nos situamos en la ultima disponible
+          if (this.numPage > 0 && this.numPage >= data.totalPages) {
+            this.numPage = data.totalPages - 1;
+            this.getPage();
+          }
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error(error);
+        },
+      });
   }
 
   goToPage(numPage: number) {
     this.numPage = numPage;
+    this.getPage();
+    return false;
+  }
+
+  onOrder(order: string) {
+    if (this.orderField === order) {
+      this.orderDirection = this.orderDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.orderField = order;
+      this.orderDirection = 'asc';
+    }
+    this.numPage = 0;
     this.getPage();
     return false;
   }
@@ -79,7 +97,41 @@ export class CastanyeraRoutedAdminPlist {
         this.rellenando = false;
         this.rellenaError = 'Error generando datos fake';
         console.error(err);
-      }
+      },
+    });
+  }
+
+  publicar(id: number) {
+    this.publishingId = id;
+    this.publishingAction = 'publicar';
+    this.oCastanyeraService.publicar(id).subscribe({
+      next: () => {
+        this.publishingId = null;
+        this.publishingAction = null;
+        this.getPage();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.publishingId = null;
+        this.publishingAction = null;
+        console.error(err);
+      },
+    });
+  }
+
+  despublicar(id: number) {
+    this.publishingId = id;
+    this.publishingAction = 'despublicar';
+    this.oCastanyeraService.despublicar(id).subscribe({
+      next: () => {
+        this.publishingId = null;
+        this.publishingAction = null;
+        this.getPage();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.publishingId = null;
+        this.publishingAction = null;
+        console.error(err);
+      },
     });
   }
 }

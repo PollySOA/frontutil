@@ -38,4 +38,19 @@ export class PavonService {
     return this.oHttp.delete<number>(serverURL + '/recurso/' + id);
   }
 
+  rellenaRecurso(numPosts: number): Observable<number> {
+    return this.oHttp.post<number>(serverURL + '/recurso/generate-fake/' + numPosts, {});
+  }
+
+  empty(): Observable<number> {
+    return this.oHttp.delete<number>(serverURL + '/recurso/empty');
+  }
+
+  publicar(id: number): Observable<number> {
+    return this.oHttp.put<number>(serverURL + '/recurso/publicar/' + id, {});
+  }
+
+  despublicar(id: number): Observable<number> {
+    return this.oHttp.put<number>(serverURL + '/recurso/despublicar/' + id, {});
+  }
 }

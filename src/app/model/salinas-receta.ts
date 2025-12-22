@@ -3,7 +3,7 @@ export interface ISalinasReceta {
     nombre: string
     ingredientes: string
     preparacion: string
+    publicado: boolean
     fechaCreacion: string
     fechaModificacion: any
-
 }

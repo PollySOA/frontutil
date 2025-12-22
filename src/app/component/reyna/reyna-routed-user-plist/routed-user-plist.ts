@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { IPage } from '../../../model/plist';
 import { IReyna } from '../../../model/reyna';
-import { ReynaService } from '../../../service/reyna';
+import { ReynaService } from '../../../service/reyna/reyna';
 import { DatetimePipe } from '../../../pipe/datetime-pipe';
 
 @Component({

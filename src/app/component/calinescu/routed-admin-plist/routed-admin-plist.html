@@ -10,9 +10,14 @@
           </h1>
           <p class="text-muted small mb-0">Gestiona los items de tu lista de compra</p>
         </div>
-        <a [routerLink]="['/calinescu/new']" class="btn btn-primary">
-          <i class="bi bi-plus-circle me-2"></i>Nuevo Item
-        </a>
+        <div class="btn-group">
+          <a [routerLink]="['/calinescu']" class="btn btn-outline-secondary">
+            <i class="bi bi-eye me-1"></i>Ver Público
+          </a>
+          <a [routerLink]="['/calinescu/new']" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nuevo Item
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -52,16 +57,16 @@
                   role="status"
                   aria-hidden="true"
                 ></span>
-                Generando...
-                } @else {
-                <i class="bi bi-gear-fill me-2"></i>Generar
-                }
+                Generando... } @else {
+                <i class="bi bi-gear-fill me-2"></i>Generar }
               </button>
             </div>
             <div class="col-auto">
               <button
                 class="btn btn-danger btn-sm"
-                [disabled]="borrandoTodo || !oPage || !oPage.totalElements || oPage.totalElements === 0"
+                [disabled]="
+                  borrandoTodo || !oPage || !oPage.totalElements || oPage.totalElements === 0
+                "
                 (click)="confirmarBorrarTodo()"
                 title="Acción irreversible"
               >
@@ -71,10 +76,8 @@
                   role="status"
                   aria-hidden="true"
                 ></span>
-                Borrando...
-                } @else {
-                <i class="bi bi-trash-fill me-2"></i>Borrar Todo (Irreversible)
-                }
+                Borrando... } @else {
+                <i class="bi bi-trash-fill me-2"></i>Borrar Todo (Irreversible) }
               </button>
             </div>
             <div class="col">
@@ -99,13 +102,22 @@
   <div class="row mb-3">
     <div class="col">
       <div class="d-flex justify-content-between align-items-center">
-        <app-paginacion
-          [numPage]="numPage"
-          [numPages]="oPage?.totalPages || 1"
-          (pageChange)="irAPagina($event)"
-        >
-        </app-paginacion>
-        <app-botonera-rpp [numRpp]="numRpp" (rppChange)="cambiarRpp($event)"></app-botonera-rpp>
+        <input
+          class="form-control form-control-sm"
+          style="max-width: 300px;"
+          placeholder="Filtrar por nombre o contenido"
+          (input)="onFilterChange($any($event.target).value)"
+        />
+        @if (oPage && oPage.totalElements > 0) {
+        <div class="d-flex align-items-center gap-3">
+          <app-paginacion
+            [numPage]="numPage"
+            [numPages]="oPage.totalPages || 1"
+            (pageChange)="irAPagina($event)"
+          ></app-paginacion>
+          <app-botonera-rpp [numRpp]="numRpp" (rppChange)="cambiarRpp($event)"></app-botonera-rpp>
+        </div>
+        }
       </div>
     </div>
   </div>
@@ -116,74 +128,149 @@
       <div class="card shadow-sm">
         <div class="table-responsive">
           <table class="table table-hover table-striped mb-0">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">Precio</th>
-          <th scope="col">Cantidad</th>
-          <th scope="col">Fecha Compra Esperada</th>
-          <th scope="col">Creación</th>
-          <th scope="col">Modificación</th>
-          <th scope="col">Publicado</th>
-          <th scope="col">Operaciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (oCalinescu of oPage?.content; track oCalinescu.id ) {
-        <tr>
-          <th scope="row">{{ oCalinescu.id }}</th>
-          <td>{{ oCalinescu.nombre }}</td>
-          <td>
-            <span class="badge bg-info text-dark">
-              {{ oCalinescu.precio || 0 | number: '1.2-2' }} €
-            </span>
-          </td>
-          <td>
-            <span class="badge bg-secondary">
-              {{ oCalinescu.cantidad || 1 }}
-            </span>
-          </td>
-          <td>{{ oCalinescu.fecha_compra_esperada | datetime }}</td>
-          <td>{{ oCalinescu.fecha_creacion | datetime }}</td>
-          <td>{{ oCalinescu.fecha_modificacion | datetime }}</td>
-          <td>
-            @if (oCalinescu.publicado) {
-              <i class="bi bi-check-circle-fill text-success"></i>
-            } @else {
-              <i class="bi bi-x-circle-fill text-danger"></i>
-            }
-          </td>
-          <td>
-            <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
-              <a [routerLink]="['/calinescu/view', oCalinescu.id]" class="btn btn-outline-primary">
-                <i class="bi bi-eye"></i>
-              </a>
-              <a [routerLink]="['/calinescu/edit', oCalinescu.id]" class="btn btn-outline-secondary">
-                <i class="bi bi-pencil-square"></i>
-              </a>
-              <a [routerLink]="['/calinescu/remove', oCalinescu.id]" class="btn btn-outline-danger">
-                <i class="bi bi-trash"></i>
-              </a>
-            </div>
-          </td>
-        </tr>
-        }
-      </tbody>
-      <tfoot>
-        <tr class="table-success">
-          <th colspan="2" class="text-end fw-bold">TOTAL DE TODA LA LISTA:</th>
-          <th>
-            <span class="badge bg-success fs-6">
-              <i class="bi bi-currency-euro me-1"></i>{{ totalGlobal | number: '1.2-2' }} €
-            </span>
-          </th>
-          <th colspan="5" class="text-muted small">
-            <i class="bi bi-info-circle me-1"></i>Total de {{ oPage?.totalElements || 0 }} productos
-          </th>
-        </tr>
-      </tfoot>
-    </table>
+            <thead>
+              <tr>
+                <th scope="col" (click)="onOrder('id')" style="cursor: pointer">
+                  ID @if (orderField === 'id') { @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1"></i> } @else {
+                  <i class="bi bi-caret-down-fill ms-1"></i> } }
+                </th>
+                <th scope="col" (click)="onOrder('nombre')" style="cursor: pointer">
+                  Nombre @if (orderField === 'nombre') { @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1"></i> } @else {
+                  <i class="bi bi-caret-down-fill ms-1"></i> } }
+                </th>
+                <th scope="col" (click)="onOrder('precio')" style="cursor: pointer">
+                  Precio @if (orderField === 'precio') { @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1"></i> } @else {
+                  <i class="bi bi-caret-down-fill ms-1"></i> } }
+                </th>
+                <th scope="col" (click)="onOrder('cantidad')" style="cursor: pointer">
+                  Cantidad @if (orderField === 'cantidad') { @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1"></i> } @else {
+                  <i class="bi bi-caret-down-fill ms-1"></i> } }
+                </th>
+                <th scope="col">Fecha Compra Esperada</th>
+                <th scope="col" (click)="onOrder('fecha_creacion')" style="cursor: pointer">
+                  Creación @if (orderField === 'fecha_creacion') { @if (orderDirection === 'asc') {
+                  <i class="bi bi-caret-up-fill ms-1"></i> } @else {
+                  <i class="bi bi-caret-down-fill ms-1"></i> } }
+                </th>
+                <th scope="col" (click)="onOrder('fecha_modificacion')" style="cursor: pointer">
+                  Modificación @if (orderField === 'fecha_modificacion') { @if (orderDirection ===
+                  'asc') { <i class="bi bi-caret-up-fill ms-1"></i> } @else {
+                  <i class="bi bi-caret-down-fill ms-1"></i> } }
+                </th>
+                <th scope="col">Publicado</th>
+                <th scope="col">Operaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (oCalinescu of oPage?.content; track oCalinescu.id ) {
+              <tr>
+                <th scope="row">{{ oCalinescu.id }}</th>
+                <td>{{ oCalinescu.nombre }}</td>
+                <td>
+                  <span class="badge bg-info text-dark">
+                    {{ oCalinescu.precio || 0 | number : '1.2-2' }} €
+                  </span>
+                </td>
+                <td>
+                  <span class="badge bg-secondary">
+                    {{ oCalinescu.cantidad || 1 }}
+                  </span>
+                </td>
+                <td>{{ oCalinescu.fecha_compra_esperada | datetime }}</td>
+                <td>{{ oCalinescu.fecha_creacion | datetime }}</td>
+                <td>{{ oCalinescu.fecha_modificacion | datetime }}</td>
+                <td>
+                  @if (oCalinescu.publicado) {
+                  <i class="bi bi-check-circle-fill text-success"></i>
+                  } @else {
+                  <i class="bi bi-x-circle-fill text-danger"></i>
+                  }
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
+                    <a
+                      [routerLink]="['/calinescu/view', oCalinescu.id]"
+                      class="btn btn-outline-primary"
+                    >
+                      <i class="bi bi-eye"></i>
+                    </a>
+                    <a
+                      [routerLink]="['/calinescu/edit', oCalinescu.id]"
+                      class="btn btn-outline-secondary"
+                    >
+                      <i class="bi bi-pencil-square"></i>
+                    </a>
+                    @if (!oCalinescu.publicado) {
+                    <button
+                      class="btn btn-outline-success"
+                      title="Publicar"
+                      [disabled]="publishingId === oCalinescu.id"
+                      (click)="publicar(oCalinescu.id)"
+                    >
+                      @if (publishingId === oCalinescu.id && publishingAction === 'publicar') {
+                      <span
+                        class="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      } @if (!(publishingId === oCalinescu.id && publishingAction === 'publicar')) {
+                      <i class="bi bi-upload"></i>
+                      }
+                    </button>
+                    } @if (oCalinescu.publicado) {
+                    <button
+                      class="btn btn-outline-warning"
+                      title="Despublicar"
+                      [disabled]="publishingId === oCalinescu.id"
+                      (click)="despublicar(oCalinescu.id)"
+                    >
+                      @if (publishingId === oCalinescu.id && publishingAction === 'despublicar') {
+                      <span
+                        class="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      } @if (!(publishingId === oCalinescu.id && publishingAction ===
+                      'despublicar')) {
+                      <i class="bi bi-download"></i>
+                      }
+                    </button>
+                    }
+                    <a
+                      [routerLink]="['/calinescu/remove', oCalinescu.id]"
+                      class="btn btn-outline-danger"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr class="table-success">
+                <th colspan="2" class="text-end fw-bold">Total de toda la lista:</th>
+                <th>
+                  <span class="badge bg-success fs-6">
+                    <i class="bi bi-currency-euro me-1"></i>{{ totalGlobal | number : '1.2-2' }} €
+                  </span>
+                </th>
+                <th colspan="5" class="text-muted small">
+                  <i class="bi bi-info-circle me-1"></i>
+                  @if (filterText) {
+                    <span class="text-primary fw-semibold">{{ oPage?.totalElements || 0 }} registros filtrados</span>
+                    de {{ totalSinFiltro }} totales
+                  } @else {
+                    {{ oPage?.totalElements || 0 }} productos en total
+                  }
+                </th>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
     </div>

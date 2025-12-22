@@ -1,9 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ReynaService } from '../../../service/reyna';
+import { ReynaService } from '../../../service/reyna/reyna';
 import { IReyna } from '../../../model/reyna';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UnroutedAdminView } from '../reyna-unrouted-admin-view/unrouted-admin-view';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-routed-admin-remove',
@@ -15,6 +16,7 @@ export class RoutedAdminRemove implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private reynaService = inject(ReynaService);
+  private snackBar = inject(MatSnackBar);
 
   oReyna: IReyna | null = null;
   loading: boolean = true;
@@ -52,6 +54,8 @@ export class RoutedAdminRemove implements OnInit {
       next: () => {
         this.deleting = false;
         this.router.navigate(['/reyna/plist']);
+        // notificar
+        this.snackBar.open('Frase motivacional borrada', 'Cerrar', { duration: 3000 });
       },
       error: (err: HttpErrorResponse) => {
         this.deleting = false;

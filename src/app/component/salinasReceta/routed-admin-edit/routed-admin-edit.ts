@@ -45,6 +45,7 @@ export class SalinasRoutedAdminEdit implements OnInit {
             preparacion: ['', [
                 Validators.required,
                 Validators.minLength(10)]],
+            publicado: [false],
         });
     }
 
@@ -55,6 +56,7 @@ export class SalinasRoutedAdminEdit implements OnInit {
                     nombre: salinasReceta.nombre,
                     ingredientes: salinasReceta.ingredientes,
                     preparacion: salinasReceta.preparacion,
+                    publicado: salinasReceta.publicado,
                 });
                 this.loading = false;
             },
@@ -77,7 +79,8 @@ export class SalinasRoutedAdminEdit implements OnInit {
             id: this.salinasRecetaId!,
             nombre: this.salinasRecetaForm.value.nombre,
             ingredientes: this.salinasRecetaForm.value.ingredientes,
-            preparacion: this.salinasRecetaForm.value.preparacion
+            preparacion: this.salinasRecetaForm.value.preparacion,
+            publicado: this.salinasRecetaForm.value.publicado,
         };
 
         this.SalinasService.update(payload).subscribe({
@@ -103,5 +106,9 @@ export class SalinasRoutedAdminEdit implements OnInit {
 
     get ingredientes() {
         return this.salinasRecetaForm.get('ingredientes');
+    }
+
+    get publicado() {
+        return this.salinasRecetaForm.get('publicado');
     }
 }

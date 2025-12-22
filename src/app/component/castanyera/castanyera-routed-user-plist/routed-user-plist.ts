@@ -16,7 +16,7 @@ export class CastanyeraRoutedUserPlist {
   oPage: IPage<ICastanyera> | null = null;
   numPage: number = 0;
   numRpp: number = 2;
- 
+
   constructor(private oCastanyeraService: CastanyeraService) {}
 
   oBotonera: string[] = [];
@@ -26,12 +26,8 @@ export class CastanyeraRoutedUserPlist {
   }
 
   getPage() {
-    this.oCastanyeraService.getPage(this.numPage, this.numRpp).subscribe({
+    this.oCastanyeraService.getPage(this.numPage, this.numRpp, 'fechaCreacion', 'desc').subscribe({
       next: (data: IPage<ICastanyera>) => {
-        
-        // Filtrar client-side para mostrar solo publicaciones públicas
-        data.content = data.content.filter((item) => item.publico === true);
-        data.numberOfElements = data.content.length;
         this.oPage = data;
         // OJO! si estamos en una página que supera el límite entonces nos situamos en la ultima disponible
         if (this.numPage > 0 && this.numPage >= data.totalPages) {

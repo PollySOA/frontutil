@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { IRecurso } from '../../../model/pavon/recurso';
 import { PavonService } from '../../../service/pavon/recurso';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UnroutedAdminViewPavon } from "../unrouted-admin-view/unrouted-admin-view";
 
 @Component({
   selector: 'app-routed-admin-view',
-  imports: [UnroutedAdminViewPavon],
+  imports: [UnroutedAdminViewPavon, RouterLink],
   templateUrl: './routed-admin-view.html',
   styleUrl: './routed-admin-view.css',
 })

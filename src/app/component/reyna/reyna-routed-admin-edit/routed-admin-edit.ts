@@ -1,9 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ReynaService } from '../../../service/reyna';
+import { ReynaService } from '../../../service/reyna/reyna';
 import { IReyna } from '../../../model/reyna';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-routed-admin-edit',
@@ -23,6 +24,8 @@ export class RoutedAdminEdit implements OnInit {
   error: string | null = null;
   submitting: boolean = false;
   private originalReyna: IReyna | null = null;
+
+  constructor(private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -75,21 +78,31 @@ export class RoutedAdminEdit implements OnInit {
       frase: this.reynaForm.value.frase,
       autor: this.reynaForm.value.autor,
       esPublica: this.reynaForm.value.esPublica,
+      // notificar
+      
     };
 
     this.reynaService.update(payload).subscribe({
       next: () => {
         this.submitting = false;
+        if(this.reynaForm){
+          this.reynaForm.markAsPristine();
+        }
+        // notificar éxito
+        this.snackBar.open('Frase motivacional guardada con éxito', 'Cerrar', { duration: 3000 });
         this.router.navigate(['/reyna/plist']);
       },
       error: (err: HttpErrorResponse) => {
         this.submitting = false;
         this.error = 'Error al guardar la frase motivacional';
+        this.snackBar.open('Error al guardar la frase motivacional', 'Cerrar', { duration: 4000 });
         console.error(err);
       },
     });
   }
 
+
+  
   get frase() {
     return this.reynaForm.get('frase');
   }

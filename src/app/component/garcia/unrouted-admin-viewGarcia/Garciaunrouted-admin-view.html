@@ -28,8 +28,22 @@
               <td>{{ oGarcia?.fechaInicio }}</td>
             </tr>
             <tr>
+              <th scope="col">Modificacion</th>
+              <td>{{ oGarcia?.fechaModificacion }}</td>
+            </tr>
+            <tr>
               <th scope="col">Final</th>
               <td>{{ oGarcia?.fechaFinal }}</td>
+            </tr>
+            <tr>
+              <th scope="col">publico</th>
+              <td>
+                @if (oGarcia?.publico) {
+                <span class="badge bg-success">publico</span>
+                } @else {
+                <span class="badge bg-secondary">Privado</span>
+                }
+              </td>
             </tr>
           </thead>
         </table>

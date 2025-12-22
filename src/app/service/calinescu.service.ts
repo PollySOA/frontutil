@@ -41,6 +41,12 @@ export class CalinescuService {
     return this.oHttp.get<IPage<ICalinescu>>(serverURL + `/calinescuListaCompra?page=${page}&size=${rpp}&sort=${order},${direction}${publicadoParam}`);
   }
 
+  getPageWithFilter(page: number, rpp: number, order: string = '', direction: string = '', soloPublicados: boolean = false, filter: string = ''): Observable<IPage<ICalinescu>> {
+    const publicadoParam = soloPublicados ? '&publicado=true' : '';
+    const filterParam = filter ? `&filter=${encodeURIComponent(filter)}` : '';
+    return this.oHttp.get<IPage<ICalinescu>>(serverURL + `/calinescuListaCompra?page=${page}&size=${rpp}&sort=${order},${direction}${publicadoParam}${filterParam}`);
+  }
+
   /**
    * Obtiene un item específico de la lista de compras por su ID.
    * 
@@ -101,6 +107,21 @@ export class CalinescuService {
 
   deleteAll(): Observable<number> {
     return this.oHttp.delete<number>(serverURL + '/calinescuListaCompra/all');
+  }
+
+  publicar(id: number): Observable<number> {
+    return this.oHttp.post<number>(serverURL + '/calinescuListaCompra/publicar/' + id, {});
+  }
+
+  despublicar(id: number): Observable<number> {
+    return this.oHttp.post<number>(serverURL + '/calinescuListaCompra/despublicar/' + id, {});
+  }
+
+  getCount(soloPublicados: boolean = false, filter: string = ''): Observable<number> {
+    const publicadoParam = soloPublicados ? '?publicado=true' : '';
+    const separator = publicadoParam ? '&' : '?';
+    const filterParam = filter ? `${separator}filter=${encodeURIComponent(filter)}` : '';
+    return this.oHttp.get<number>(serverURL + '/calinescuListaCompra/count' + publicadoParam + filterParam);
   }
 
 }

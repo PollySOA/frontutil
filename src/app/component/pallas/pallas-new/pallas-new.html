@@ -13,13 +13,6 @@
       <form [formGroup]="oForm" (ngSubmit)="onSubmit()">
 
         <div class="mb-3 row">
-          <label class="col-sm-2 col-form-label">ID</label>
-          <div class="col-sm-10">
-            <input type="text" class="form-control" formControlName="id" readonly placeholder="(Autogenerado)">
-          </div>
-        </div>
-
-        <div class="mb-3 row">
           <label class="col-sm-2 col-form-label">Título</label>
           <div class="col-sm-10">
             <input type="text" class="form-control" formControlName="titulo" 
@@ -66,8 +59,7 @@
         </div>
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button type="button" class="btn btn-secondary" [routerLink]="['/pallas/plist']">Volver</button>
-          
+          <button type="button" class="btn btn-secondary" [routerLink]="['/pallas']">Volver</button>
           <button type="submit" class="btn btn-primary" [disabled]="!oForm.valid">Guardar Nota</button>
         </div>
 

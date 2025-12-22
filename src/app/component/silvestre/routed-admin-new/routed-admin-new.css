@@ -30,31 +30,3 @@ input.form-control, textarea.form-control{
 
 .is-invalid{ border-color:#dc3545 !important; }
 .is-valid{ border-color:#198754 !important; }
-
-.new-form button.btn-primary{
-  border-radius: 8px;
-  background: linear-gradient(180deg, #c5808f 0%, #c2989f 55%, #e6babf 100%);
-  border: 1px solid rgba(199,156,165,0.18);
-  color: #ffffff;
-  padding: .45rem .9rem;
-  box-shadow: 0 8px 20px rgba(199,156,165,0.12), inset 0 1px 0 rgba(255,255,255,0.35);
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
-  font-weight: 600;
-}
-
-/* hover/active */
-.new-form button.btn-primary:hover{
-  transform: translateY(-2px);
-  filter: brightness(1.04);
-  box-shadow: 0 14px 30px rgba(199,156,165,0.14);
-}
-.new-form button.btn-primary:active{ transform: translateY(0); }
-.new-form button.btn-primary:focus-visible{
-  outline: none;
-  box-shadow: 0 0 0 4px rgba(199,156,165,0.12);
-}
-.new-form button.btn-primary:disabled{
-  opacity: .65;
-  cursor: not-allowed;
-  filter: grayscale(.05) contrast(.95);
-}

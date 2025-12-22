@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { IPage } from '../../../model/plist';
+import { debug } from '../../../environment/environment';
 import { ICalinescu } from '../../../model/calinescu';
 import { CalinescuService } from '../../../service/calinescu.service';
 import { Paginacion } from "../../shared/paginacion/paginacion";
@@ -48,17 +49,17 @@ export class RoutedUserPlistCalinescu {
    * Solo carga items publicados (soloPublicados=true).
    */
   obtenerPagina() {
-    this.oCalinescuService.getPage(this.numPage, this.numRpp, 'id', 'desc', true).subscribe({
+  this.oCalinescuService.getPage(this.numPage, this.numRpp, 'id', 'desc', true).subscribe({
       next: (data: IPage<ICalinescu>) => {
         this.oPage = data;
-        console.log('Datos recibidos:', data); // Para debug
+    // datos recibidos
         if (this.numPage > 0 && this.numPage >= data.totalPages) {
           this.numPage = data.totalPages - 1;
           this.obtenerPagina();
         }
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Error al cargar datos:', error);
+        if (debug) console.error('Error al cargar datos:', error);
       },
     });
   }
@@ -87,18 +88,26 @@ export class RoutedUserPlistCalinescu {
     return false;
   }
 
+  /**
+   * Calcula el total de precios de los items en la página actual.
+   * 
+   * @returns Suma de todos los precios de la página actual
+   */
   calcularTotal(): number {
     if (!this.oPage || !this.oPage.content) return 0;
     return this.oPage.content.reduce((sum, item) => sum + (item.precio || 0), 0);
   }
 
+  /**
+   * Carga el total global de precios de todos los items publicados desde el servidor.
+   */
   cargarTotalGlobal() {
     this.oCalinescuService.getTotalPrecios(true).subscribe({
       next: (total: number) => {
         this.totalGlobal = total;
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Error al cargar total global:', error);
+        if (debug) console.error('Error al cargar total global:', error);
       },
     });
   }

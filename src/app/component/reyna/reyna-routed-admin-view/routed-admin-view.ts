@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IReyna } from '../../../model/reyna';
-import { ReynaService } from '../../../service/reyna';
+import { ReynaService } from '../../../service/reyna/reyna';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UnroutedAdminView } from '../reyna-unrouted-admin-view/unrouted-admin-view';

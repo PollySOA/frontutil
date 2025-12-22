@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div class="list">
+  <div class="list" *ngIf="totalElementsCount > 0">
     @for (oSalinasReceta of oPage?.content; track oSalinasReceta.id ) {
     <div class="post-row mt-5">
       <div class="post-item">
@@ -46,5 +46,15 @@
       >
       </app-paginacion>
     </div>
+  
+  <div class="d-flex justify-content-center mt-5" *ngIf="totalElementsCount === 0">
+    <div class="alert alert-secondary text-center w-100" style="max-width:720px">
+      <h5 class="mb-1">No hay recetas</h5>
+      <p class="small mb-2">No hay recetas públicas para mostrar en este momento.</p>
+      <div>
+  <a href="/receta/plist" class="btn btn-sm btn-outline-secondary me-2">Mantenimiento</a>
+      </div>
+    </div>
+  </div>
   
 </div>

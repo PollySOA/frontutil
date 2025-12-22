@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { serverURL } from '../environment/environment';
-import { IPage } from '../model/plist';
-import { IReyna } from '../model/reyna';
+import { serverURL } from '../../environment/environment';
+import { IPage } from '../../model/plist';
+import { IReyna } from '../../model/reyna';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -32,6 +32,10 @@ export class ReynaService {
     return this.oHttp.get<IReyna>(serverURL + '/frasesmotivacionales/' + id);
   }
 
+  empty(): Observable<number> {
+    return this.oHttp.delete<number>(serverURL + '/frasesmotivacionales/empty');
+  }
+
   create(reyna: Partial<IReyna>): Observable<number> {
     return this.oHttp.post<number>(serverURL + '/frasesmotivacionales', reyna);
   }
@@ -52,8 +56,15 @@ export class ReynaService {
     return this.oHttp.get<number>(serverURL + '/frasesmotivacionales/rellena/' + numFrases);
   }
 
-  togglePublica(reyna: IReyna): Observable<number> {
-    const updated = { ...reyna, esPublica: !reyna.esPublica };
-    return this.oHttp.put<number>(serverURL + '/frasesmotivacionales', updated);
+  // togglePublica(reyna: IReyna): Observable<number> {
+  //   const updated = { ...reyna, esPublica: !reyna.esPublica };
+  //   return this.oHttp.put<number>(serverURL + '/frasesmotivacionales', updated);
+  // }
+  publicar(id: number): Observable<number> {
+    return this.oHttp.put<number>(serverURL + '/frasesmotivacionales/publicar/' + id, {});
+  }
+
+  despublicar(id: number): Observable<number> {
+    return this.oHttp.put<number>(serverURL + '/frasesmotivacionales/despublicar/' + id, {});
   }
 }

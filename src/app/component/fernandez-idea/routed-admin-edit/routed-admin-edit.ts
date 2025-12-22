@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { FernandezIdeaService } from '../../../service/fernandez-idea.service';
 import { IFernandezIdea } from '../../../model/fernandez-idea';
 import { HttpErrorResponse } from '@angular/common/http';
+import { debug } from '../../../environment/environment';
+import { CanComponentDeactivate } from '../../../guards/pending-changes.guard';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-fernandez-routed-admin-edit',
@@ -11,17 +14,19 @@ import { HttpErrorResponse } from '@angular/common/http';
     templateUrl: './routed-admin-edit.html',
     styleUrl: './routed-admin-edit.css',
 })
-export class FernandezRoutedAdminEdit implements OnInit {
+export class FernandezRoutedAdminEdit implements OnInit, CanComponentDeactivate {
     private readonly fb = inject(FormBuilder);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly ideaService = inject(FernandezIdeaService);
+    protected readonly debugging = debug;
 
     ideaForm!: FormGroup;
     ideaId: number | null = null;
     loading: boolean = true;
     error: string | null = null;
     submitting: boolean = false;
+    private formSubmitted: boolean = false;
 
     ngOnInit(): void {
         this.initForm();
@@ -49,6 +54,13 @@ export class FernandezRoutedAdminEdit implements OnInit {
         });
     }
 
+    canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+        if (this.formSubmitted || !this.ideaForm.dirty) {
+            return true;
+        }
+        return confirm('Hay cambios sin guardar. ¿Desea salir sin guardar los cambios?');
+    }
+
     loadIdea(id: number): void {
         this.ideaService.get(id).subscribe({
             next: (idea: IFernandezIdea) => {
@@ -58,12 +70,13 @@ export class FernandezRoutedAdminEdit implements OnInit {
                     categoria: idea.categoria,
                     publico: idea.publico,
                 });
+                this.ideaForm.markAsPristine();
                 this.loading = false;
             },
             error: (err: HttpErrorResponse) => {
                 this.error = 'Error al cargar la idea';
                 this.loading = false;
-                console.error(err);
+                this.debugging && console.error(err);
             },
         });
     }
@@ -86,12 +99,13 @@ export class FernandezRoutedAdminEdit implements OnInit {
         this.ideaService.update(payload).subscribe({
             next: () => {
                 this.submitting = false;
+                this.formSubmitted = true;
                 this.router.navigate(['/fernandez-idea/admin/plist']);
             },
             error: (err: HttpErrorResponse) => {
                 this.submitting = false;
                 this.error = 'Error al guardar la idea';
-                console.error(err);
+                this.debugging && console.error(err);
             },
         });
     }

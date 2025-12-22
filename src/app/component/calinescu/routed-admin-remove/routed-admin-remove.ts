@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CalinescuService } from '../../../service/calinescu.service';
+import { debug } from '../../../environment/environment';
 import { ICalinescu } from '../../../model/calinescu';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UnroutedAdminViewCalinescu } from "../unrouted-admin-view/unrouted-admin-view";
@@ -62,7 +63,7 @@ export class RoutedAdminRemoveCalinescu implements OnInit {
       error: (err: HttpErrorResponse) => {
         this.error = 'Error cargando el item';
         this.loading = false;
-        console.error(err);
+        if (debug) console.error(err);
       }
     });
   }
@@ -82,7 +83,7 @@ export class RoutedAdminRemoveCalinescu implements OnInit {
       error: (err: HttpErrorResponse) => {
         this.deleting = false;
         this.error = 'Error borrando el item';
-        console.error(err);
+        if (debug) console.error(err);
       }
     });
   }

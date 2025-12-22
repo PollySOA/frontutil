@@ -23,24 +23,26 @@ export class CastanyeraRoutedUserView {
       console.error('Invalid journal id:', idParam);
       return;
     }
-    this.getCastanyera(castanyeraId);
+  this.getCastanyera(castanyeraId);
   }
 
   ngOnInit() {}
 
   getCastanyera(castanyeraId: number) {
-    this.oCastanyeraService.get(castanyeraId).subscribe({
+    // Fetch only if public — backend should reject or return 404 for private entries
+    this.oCastanyeraService.getIfPublic(castanyeraId).subscribe({
       next: (data: ICastanyera) => {
-        if (data && data.publico === false) {
+        this.oCastanyera = data;
+        this.isPrivate = false;
+      },
+      error: (error: HttpErrorResponse) => {
+        // If the server returns 404 or 403 treat as private
+        if (error.status === 404 || error.status === 403) {
           this.oCastanyera = null;
           this.isPrivate = true;
         } else {
-          this.oCastanyera = data;
-          this.isPrivate = false;
+          console.error('Error fetching journal:', error);
         }
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error('Error fetching journal:', error);
       },
     });
   }

@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { SalinasService } from '../../../service/salinas-receta';
 import { ISalinasReceta } from '../../../model/salinas-receta';
 import { SalinasUnroutedAdminView } from '../unrouted-admin-view/unrouted-admin-view';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 
@@ -18,6 +19,7 @@ export class SalinasRoutedAdminRemove implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private salinasService = inject(SalinasService);
+  private snackBar = inject(MatSnackBar);
 
   oSalinasReceta: ISalinasReceta | null = null;
   loading: boolean = true;
@@ -54,11 +56,13 @@ export class SalinasRoutedAdminRemove implements OnInit {
     this.salinasService.delete(this.oSalinasReceta.id).subscribe({
       next: () => {
         this.deleting = false;
+        this.snackBar.open('Receta borrada correctamente', 'Cerrar', { duration: 3000 });
         this.router.navigate(['/receta/plist']);
       },
       error: (err: HttpErrorResponse) => {
         this.deleting = false;
-        this.error = 'Error borrando el post';
+        this.error = 'Error borrando la receta';
+         this.snackBar.open('Error al borrar la receta', 'Cerrar', { duration: 4000 });
         console.error(err);
       }
     });

@@ -4,10 +4,11 @@ import { SilvestreService } from '../../../service/silvestre';
 import { ISilvestre } from '../../../model/silvestre';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UnroutedAdminView } from "../unrouted-admin-view/unrouted-admin-view";
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-routed-admin-remove',
-  imports: [UnroutedAdminView],
+  imports: [UnroutedAdminView, MatSnackBarModule],
   templateUrl: './routed-admin-remove.html',
   styleUrl: './routed-admin-remove.css'
 })
@@ -15,6 +16,7 @@ export class RoutedAdminRemove implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private silvestreService = inject(SilvestreService);
+  private snackBar = inject(MatSnackBar);
 
   oSilvestre: ISilvestre | null = null;
   loading: boolean = true;
@@ -51,13 +53,14 @@ export class RoutedAdminRemove implements OnInit {
     this.silvestreService.delete(this.oSilvestre.id).subscribe({
       next: () => {
         this.deleting = false;
-        // antes: this.router.navigate(['/blog/plist']);
+        this.snackBar.open('Publicación borrada', 'Cerrar', { duration: 3000 });
         this.router.navigate(['/silvestre/plist']);
       },
       error: (err: HttpErrorResponse) => {
         this.deleting = false;
         this.error = 'Error borrando el post';
         console.error(err);
+        this.snackBar.open('Error borrando la publicación', 'Cerrar', { duration: 4000 });
       }
     });
   }

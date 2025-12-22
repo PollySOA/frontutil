@@ -2,12 +2,15 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SilvestreService } from '../../../service/silvestre';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { ISilvestre } from '../../../model/silvestre';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-routed-admin-edit',
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, MatSnackBarModule],
     templateUrl: './routed-admin-edit.html',
     styleUrl: './routed-admin-edit.css',
 })
@@ -16,6 +19,8 @@ export class RoutedAdminEdit implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private silvestreService = inject(SilvestreService);
+    private dialog = inject(MatDialog);
+    private snackBar = inject(MatSnackBar);
 
     silvestreForm!: FormGroup;
     silvestreId: number | null = null;
@@ -46,6 +51,7 @@ export class RoutedAdminEdit implements OnInit {
                 Validators.required,
                 Validators.minLength(10)]],
             urlImagen: ['', [Validators.maxLength(100)]],
+            publicado: [false],
         });
     }
 
@@ -57,6 +63,7 @@ export class RoutedAdminEdit implements OnInit {
                     titulo: silvestre.titulo,
                     descripcion: silvestre.descripcion,
                     urlImagen: silvestre.urlImagen,
+                    publicado: silvestre.publicado,
                 });
                 this.loading = false;
             },
@@ -80,20 +87,27 @@ export class RoutedAdminEdit implements OnInit {
             titulo: this.silvestreForm.value.titulo,
             descripcion: this.silvestreForm.value.descripcion,
             urlImagen: this.silvestreForm.value.urlImagen
+            ,
+            publicado: this.silvestreForm.value.publicado
         };
 
         this.silvestreService.update(payload).subscribe({
-            next: () => {
-                this.submitting = false;
-                // antes: this.router.navigate(['/blog/plist']);
-                this.router.navigate(['/silvestre/plist']);
-            },
-            error: (err: HttpErrorResponse) => {
-                this.submitting = false;
-                this.error = 'Error al guardar el post';
-                console.error(err);
-            },
-        });
+                next: () => {
+                    this.submitting = false;
+                    // marcar formulario como limpio para evitar prompt del guard
+                    if (this.silvestreForm) {
+                        this.silvestreForm.markAsPristine();
+                    }
+                    this.router.navigate(['/silvestre/plist']);
+                    this.snackBar.open('Publicación actualizada', 'Cerrar', { duration: 3000 });
+                },
+                error: (err: HttpErrorResponse) => {
+                    this.submitting = false;
+                    this.error = 'Error al guardar el post';
+                    console.error(err);
+                    this.snackBar.open('Error al guardar la publicación', 'Cerrar', { duration: 4000 });
+                },
+            });
     }
 
     get titulo() {
@@ -106,5 +120,19 @@ export class RoutedAdminEdit implements OnInit {
 
     get urlImagen() {
         return this.silvestreForm.get('urlImagen');
+    }
+
+    // Guard: ask confirmation if the form has unsaved changes
+    canDeactivate(): boolean | Promise<boolean> | import("rxjs").Observable<boolean> {
+        if (!this.silvestreForm || !this.silvestreForm.dirty) {
+            return true;
+        }
+        const ref = this.dialog.open(ConfirmDialogComponent, {
+            data: {
+                title: 'Cambios sin guardar',
+                message: 'Hay cambios sin guardar. ¿Desea salir sin guardar los cambios?'
+            }
+        });
+        return ref.afterClosed();
     }
 }

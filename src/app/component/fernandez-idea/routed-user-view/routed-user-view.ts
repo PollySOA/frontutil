@@ -6,6 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { IPage } from '../../../model/plist';
 import { Paginacion } from '../../shared/paginacion/paginacion';
 import { BotoneraRpp } from '../../shared/botonera-rpp/botonera-rpp';
+import { debug } from '../../../environment/environment';
 
 
 @Component({
@@ -17,6 +18,7 @@ import { BotoneraRpp } from '../../shared/botonera-rpp/botonera-rpp';
 export class FernandezRoutedUserView {
   private readonly oIdeaService = inject(FernandezIdeaService);
   private readonly route = inject(ActivatedRoute);
+  protected readonly debugging = debug;
 
   oIdea: IFernandezIdea | null = null;
   loading: boolean = true;
@@ -32,7 +34,7 @@ export class FernandezRoutedUserView {
     const idParam = this.route.snapshot.paramMap.get('id');
     this.ideaId = idParam ? Number(idParam) : NaN;
     if (isNaN(this.ideaId)) {
-      console.error('Invalid idea id:', idParam);
+      this.debugging && console.error('Invalid idea id:', idParam);
       this.error = 'ID de idea inválido';
       this.loading = false;
       return;
@@ -70,7 +72,7 @@ export class FernandezRoutedUserView {
         this.oPage = data;
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Error fetching page:', error);
+        this.debugging && console.error('Error fetching page:', error);
       },
     });
   }

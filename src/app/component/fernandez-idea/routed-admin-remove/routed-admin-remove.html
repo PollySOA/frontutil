@@ -11,6 +11,10 @@
       <div class="alert alert-danger" role="alert">
         <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
       </div>
+      } @if (info) {
+      <div class="alert alert-success" role="status">
+        <i class="bi bi-check-circle me-2"></i>{{ info }}
+      </div>
       } @if (!loading && !error && oIdea) {
 
       <app-fernandez-unrouted-admin-view [oIdea]="oIdea"> </app-fernandez-unrouted-admin-view>

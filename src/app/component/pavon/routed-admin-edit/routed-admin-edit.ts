@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
 import { PavonService } from '../../../service/pavon/recurso';
 import { IRecurso } from '../../../model/pavon/recurso';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -36,6 +36,18 @@ export class RoutedAdminEditPavon implements OnInit {
         }
     }
 
+    // Validador custom para URL absoluta
+    private urlValidator(control: AbstractControl) {
+        const value = control.value;
+        if (!value) return null;
+        try {
+            new URL(value);
+            return null;
+        } catch {
+            return { invalidUrl: true };
+        }
+    }
+
     initForm(): void {
         this.recursoForm = this.fb.group({
             nombre: ['', [
@@ -44,7 +56,9 @@ export class RoutedAdminEditPavon implements OnInit {
                 Validators.maxLength(200)]],
             url: ['', [
                 Validators.required,
-                Validators.minLength(10)]],
+                Validators.minLength(10),
+                this.urlValidator.bind(this)
+            ]],
             publico: [false],
         });
     }
@@ -75,17 +89,23 @@ export class RoutedAdminEditPavon implements OnInit {
         }
 
         this.submitting = true;
-        const payload: Partial<IRecurso> = {
+        const formValue = this.recursoForm.getRawValue();
+        
+        // Construir payload - usar cualquier tipo para permitir diferentes formatos
+        const payload: any = {
             id: this.recursoId!,
-            nombre: this.recursoForm.value.nombre,
-            url: this.recursoForm.value.url,
-            publico: this.recursoForm.value.publico
+            nombre: formValue.nombre,
+            url: formValue.url,
+            publico: formValue.publico === true || formValue.publico === 'true' || formValue.publico === 1,
+            fechaCreacion: this.originalRecurso?.fechaCreacion || '',
+            fechaModificacion: this.originalRecurso?.fechaModificacion || null
         };
 
+        console.log('Enviando payload:', JSON.stringify(payload));
         this.pavonService.update(payload).subscribe({
             next: () => {
                 this.submitting = false;
-                this.router.navigate(['/recurso/plist']);
+                this.router.navigate(['/recurso/plist'], { queryParams: { msg: 'Recurso actualizado correctamente' } });
             },
             error: (err: HttpErrorResponse) => {
                 this.submitting = false;

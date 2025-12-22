@@ -24,7 +24,7 @@
               [class.is-valid]="nombre?.valid && nombre?.touched"
               id="nombre"
               formControlName="nombre"
-              placeholder="Introduce el nombre del recurso"
+              placeholder="Introduce el nombre del post"
             />
             @if (nombre?.invalid && nombre?.touched) {
             <div class="invalid-feedback">
@@ -44,38 +44,45 @@
           <!-- URL -->
           <div class="mb-4">
             <label for="url" class="form-label">URL <span class="text-danger">*</span></label>
-            <input
-              type="text"
+            <textarea
               class="form-control"
               [class.is-invalid]="url?.invalid && url?.touched"
               [class.is-valid]="url?.valid && url?.touched"
               id="url"
               formControlName="url"
-              placeholder="Introduce la URL del recurso"
-            />
+              rows="8"
+              placeholder="Escribe la url del post"
+            ></textarea>
             @if (url?.invalid && url?.touched) {
             <div class="invalid-feedback">
               @if (url?.errors?.['required']) {
-                <span>La URL es obligatoria.</span>
+                <span>La url es obligatoria.</span>
               }
               @if (url?.errors?.['minlength']) {
-                <span>La URL debe tener al menos 3 caracteres.</span>
+                <span>La url debe tener al menos 10 caracteres.</span>
+              }
+              @if (url?.errors?.['invalidUrl']) {
+                <span>La URL no tiene un formato válido (ej. https://example.com).</span>
               }
             </div>
             }
           </div>
 
-          <!-- Público -->
-          <div class="mb-4 form-check">
-            <input
-              type="checkbox"
-              class="form-check-input"
-              id="publico"
-              formControlName="publico"
-            />
-            <label class="form-check-label" for="publico">
-              Público
-            </label>
+          <!-- Publico -->
+          <div class="mb-4">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="publico"
+                formControlName="publico"
+              />
+              <label class="form-check-label" for="publico">
+                <i class="bi bi-eye me-1"></i>Publicar post (visible para usuarios)
+              </label>
+            </div>
+            <small class="form-text text-muted">Si no se marca, el post permanecerá como borrador</small>
           </div>
 
           <!-- Botones -->
@@ -94,7 +101,7 @@
               @if (!submitting) {
                 <i class="bi bi-plus-circle me-2"></i>
               }
-              Crear Recurso
+              Crear Post
             </button>
           </div>
         </form>

@@ -3,11 +3,27 @@
     <h1>Mantenimiento de la receta</h1>
   </div>
 
+  
   <div class="d-flex justify-content-center my-3">
     <a [routerLink]="['/receta/new']" class="btn btn-success btn-sm">
       <i class="bi bi-plus-circle me-2"></i>Crear una nueva receta
     </a>
+    <a [routerLink]="['/receta']" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-eye me-2"></i>Ver Recurso Público
+    </a>
   </div>
+
+
+   <!-- Aviso (mensaje desde queryParams) -->
+  @if (message) {
+  <div class="d-flex justify-content-center my-2">
+    <div class="alert alert-success w-100 text-center" role="alert">
+      {{ message }}
+    </div>
+  </div>
+  }
+
+
 
   <div class="d-flex justify-content-center my-3">
     <div class="card shadow-sm p-3 w-100" style="max-width: 720px">
@@ -41,20 +57,30 @@
           } Generar
         </button>
 
-        @if (rellenaOk) {
-        <div class="text-success small d-flex align-items-center">
-          <i class="bi bi-check-circle me-1"></i>{{ rellenaOk }} recetas
+        <button
+          class="btn btn-danger btn-sm position-relative"
+          [disabled]="emptying"
+          (click)="openEmptyConfirm()"
+          title="Vaciar tabla"
+        >
+          @if (emptying) {
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          } @if (!emptying) {
+          <i class="bi bi-trash me-2"></i>
+          } Vaciar tabla
+        </button>
+         <div class="text-success small d-flex align-items-center">
+          <i class="bi bi-check-circle me-1"></i>Registros: {{ totalElementsCount }}
         </div>
-        } @if (rellenaError) {
-        <div class="text-danger small d-flex align-items-center">
-          <i class="bi bi-exclamation-triangle me-1"></i>{{ rellenaError }}
-        </div>
-        }
       </div>
     </div>
   </div>
 
-  <div class="d-flex justify-content-between my-1">
+  <div class="d-flex justify-content-between my-1" [hidden]="totalElementsCount === 0">
     <app-paginacion
       [numPage]="numPage"
       [numPages]="oPage?.totalPages || 1"
@@ -65,42 +91,204 @@
     <app-botonera-rpp [numRpp]="numRpp" (rppChange)="onRppChange($event)"> </app-botonera-rpp>
   </div>
 
-  <div class="d-flex justify-content-center">
-    <table class="table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">Ingredientes</th>
-          <th scope="col">Creación</th>
-          <th scope="col">Actualización</th>
-          <th scope="col">Operaciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (oSalinasReceta of oPage?.content; track oSalinasReceta.id ) {
+  <div
+  class="d-flex justify-content-center"
+  [hidden]="totalElementsCount === 0"
+>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <!-- ID -->
+        <th scope="col" (click)="onOrder('id')" style="cursor: pointer; width: 5%">
+          <span class="header-inline">
+            ID
+            @if (orderField === 'id') {
+              @if (orderDirection === 'asc') {
+                <i class="bi bi-caret-up-fill ms-1"></i>
+              }
+              @if (orderDirection === 'desc') {
+                <i class="bi bi-caret-down-fill ms-1"></i>
+              }
+            }
+          </span>
+        </th>
+
+        <!-- Nombre -->
+        <th
+          scope="col"
+          (click)="onOrder('nombre')"
+          style="cursor: pointer; width: 25%"
+        >
+          <span class="header-inline">
+            Nombre
+            @if (orderField === 'nombre') {
+              @if (orderDirection === 'asc') {
+                <i class="bi bi-caret-up-fill ms-1"></i>
+              }
+              @if (orderDirection === 'desc') {
+                <i class="bi bi-caret-down-fill ms-1"></i>
+              }
+            }
+          </span>
+        </th>
+
+        <!-- Ingredientes -->
+        <th scope="col" style="width: 30%">Ingredientes</th>
+
+        <!-- Publicado -->
+        <th
+          scope="col"
+          (click)="onOrder('publicado')"
+          style="cursor: pointer; width: 10%"
+        >
+          <span class="header-inline">
+            Estado
+            @if (orderField === 'publicado') {
+              @if (orderDirection === 'asc') {
+                <i class="bi bi-caret-up-fill ms-1"></i>
+              }
+              @if (orderDirection === 'desc') {
+                <i class="bi bi-caret-down-fill ms-1"></i>
+              }
+            }
+          </span>
+        </th>
+
+        <!-- Fecha creación -->
+        <th
+          scope="col"
+          (click)="onOrder('fechaCreacion')"
+          style="cursor: pointer; width: 15%"
+        >
+          <span class="header-inline">
+            Creación
+            @if (orderField === 'fechaCreacion') {
+              @if (orderDirection === 'asc') {
+                <i class="bi bi-caret-up-fill ms-1"></i>
+              }
+              @if (orderDirection === 'desc') {
+                <i class="bi bi-caret-down-fill ms-1"></i>
+              }
+            }
+          </span>
+        </th>
+
+        <!-- Fecha modificación -->
+        <th
+          scope="col"
+          (click)="onOrder('fechaModificacion')"
+          style="cursor: pointer; width: 15%"
+        >
+          <span class="header-inline">
+            Actualización
+            @if (orderField === 'fechaModificacion') {
+              @if (orderDirection === 'asc') {
+                <i class="bi bi-caret-up-fill ms-1"></i>
+              }
+              @if (orderDirection === 'desc') {
+                <i class="bi bi-caret-down-fill ms-1"></i>
+              }
+            }
+          </span>
+        </th>
+
+        <!-- Operaciones -->
+        <th scope="col">Operaciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (oSalinasReceta of oPage?.content; track oSalinasReceta.id) {
         <tr>
           <th scope="row">{{ oSalinasReceta.id }}</th>
           <td>{{ oSalinasReceta.nombre }}</td>
           <td>{{ oSalinasReceta.ingredientes }}</td>
+
+          <!-- Estado publicado -->
+          <td class="text-center align-middle">
+            @if (oSalinasReceta.publicado) {
+              <span class="text-success d-inline-flex align-items-center">
+                <i class="bi bi-check-circle-fill me-1"></i>
+              </span>
+            }
+            @if (!oSalinasReceta.publicado) {
+              <span class="text-secondary d-inline-flex align-items-center">
+                <i class="bi bi-x-circle-fill me-1"></i>
+              </span>
+            }
+          </td>
+
           <td>{{ oSalinasReceta.fechaCreacion | datetime }}</td>
           <td>{{ oSalinasReceta.fechaModificacion | datetime }}</td>
+
+          <!-- Operaciones -->
           <td>
-            <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
-              <a [routerLink]="['/receta/view', oSalinasReceta.id]" class="btn btn-outline-primary">
+            <div
+              class="btn-group btn-group-sm"
+              role="group"
+              aria-label="Small button group"
+            >
+              <a
+                [routerLink]="['/receta/view', oSalinasReceta.id]"
+                class="btn btn-outline-primary"
+              >
                 <i class="bi bi-eye"></i>
               </a>
-              <a [routerLink]="['/receta/edit', oSalinasReceta.id]" class="btn btn-outline-secondary">
+
+              <a
+                [routerLink]="['/receta/edit', oSalinasReceta.id]"
+                class="btn btn-outline-secondary"
+              >
                 <i class="bi bi-pencil-square"></i>
               </a>
-              <a [routerLink]="['/receta/remove', oSalinasReceta.id]" class="btn btn-outline-danger">
+
+              <!-- Publicar -->
+              @if (!oSalinasReceta.publicado) {
+                <button
+                  class="btn btn-outline-success"
+                  title="Publicar"
+                  (click)="publicar(oSalinasReceta.id)"
+                >
+                  <i class="bi bi-upload"></i>
+                </button>
+              }
+
+              <!-- Despublicar -->
+              @if (oSalinasReceta.publicado) {
+                <button
+                  class="btn btn-outline-danger"
+                  title="Despublicar"
+                  (click)="despublicar(oSalinasReceta.id)"
+                >
+                  <i class="bi bi-eye-slash"></i>
+                </button>
+              }
+
+              <a
+                [routerLink]="['/receta/remove', oSalinasReceta.id]"
+                class="btn btn-outline-danger"
+              >
                 <i class="bi bi-trash"></i>
               </a>
             </div>
           </td>
         </tr>
-        }
-      </tbody>
-    </table>
+      }
+    </tbody>
+  </table>
+</div>
+ @if (totalElementsCount === 0) {
+  <div class="d-flex justify-content-center my-4">
+    <div class="alert alert-secondary text-center w-100" style="max-width: 720px">
+      <h5 class="mb-1">No hay recetas</h5>
+      <p class="small mb-2">No hay registros para mostrar en este momento.</p>
+      <div>
+        <a [routerLink]="['/receta/new']" class="btn btn-sm btn-primary me-2">Crear primera receta</a>
+        <button class="btn btn-sm btn-outline-secondary" (click)="generarFake()">
+          Generar datos de prueba
+        </button>
+      </div>
+    </div>
   </div>
+  }
 </div>
