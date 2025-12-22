@@ -250,12 +250,14 @@ export class SoaresRoutedAdminPlist {
   }
 
   cerrarModalVer() {
-    // Quitar foco del elemento activo para evitar error de aria-hidden
+    // Quitar foco del elemento activo y moverlo al body para evitar error de aria-hidden
     const activeElement = document.activeElement as HTMLElement;
     if (activeElement && activeElement.blur) {
       activeElement.blur();
     }
-    
+    if (document.body && document.body.focus) {
+      document.body.focus();
+    }
     setTimeout(() => {
       this.itemToView = null;
       this.modalToastMessage = null;
@@ -330,7 +332,10 @@ export class SoaresRoutedAdminPlist {
 
   confirmarEliminar() {
     if (!this.itemToDeleteId) return;
-    
+    // Mover el foco al body antes de cerrar el modal para accesibilidad
+    if (document.body && document.body.focus) {
+      document.body.focus();
+    }
     this.oSoaresService.removeOne(this.itemToDeleteId).subscribe({
       next: () => {
         this.mostrarToast('Pregunta eliminada correctamente', 'success');

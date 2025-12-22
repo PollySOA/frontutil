@@ -3,9 +3,13 @@
         <h1>Gestión de Preguntas al Universo</h1>
     </div>
 
-    <div class="d-flex justify-content-center my-3">
+
+    <div class="d-flex justify-content-center my-3 gap-2">
         <a [routerLink]="['/soares/admin/new']" class="btn btn-success btn-sm">
             <i class="bi bi-plus-circle me-2"></i>Crear Nueva Pregunta
+        </a>
+        <a [routerLink]="['/soares/user/plist']" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-2"></i>Volver
         </a>
     </div>
 
@@ -32,9 +36,6 @@
                     <i class="bi bi-trash me-2"></i>Vaciar
                 </button>
 
-                <a [routerLink]="['/soares/user/plist']" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-left me-2"></i>Volver
-                </a>
 
                 @if (rellenaOk) {
                 <div class="text-success small d-flex align-items-center">

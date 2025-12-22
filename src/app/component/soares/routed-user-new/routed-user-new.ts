@@ -29,11 +29,11 @@ export class SoaresRoutedUserNew implements OnInit {
 
   initForm(): void {
     this.soaresForm = this.fb.group({
-      preguntas: ['', 
+      preguntas: ['...', 
         {
           validators: [Validators.required, Validators.minLength(3), Validators.maxLength(500)],
           asyncValidators: [this.preguntaExistsValidator()],
-          updateOn: 'blur'
+          updateOn: 'change'
         }
       ],
     });
@@ -85,7 +85,7 @@ export class SoaresRoutedUserNew implements OnInit {
         // Redirigir después de 2 segundos
         setTimeout(() => {
           this.router.navigate(['/soares/user/plist']);
-        }, 2000);
+        }, 1000);
       },
       error: (err: HttpErrorResponse) => {
         this.submitting = false;
@@ -109,7 +109,7 @@ export class SoaresRoutedUserNew implements OnInit {
     this.toastType = tipo;
     setTimeout(() => {
       this.toastMessage = null;
-    }, 2000);
+    }, 1000);
   }
 
   get preguntas() {

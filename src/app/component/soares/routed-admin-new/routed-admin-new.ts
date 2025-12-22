@@ -26,7 +26,7 @@ export class SoaresRoutedAdminNew implements OnInit {
 
   ngOnInit(): void {
     this.soaresForm = this.fb.group({
-      preguntas: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
+      preguntas: ['...', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
       publicacion: [false, Validators.required],
     });
   }
@@ -45,7 +45,7 @@ export class SoaresRoutedAdminNew implements OnInit {
           this.mostrarToast('Frase creada correctamente', 'success');
           setTimeout(() => {
             this.router.navigate(['/soares/admin/plist']);
-          }, 2000);
+          }, 1000);
         },
         error: (err: HttpErrorResponse) => {
           this.error = err.error.message || 'Error al crear la pregunta.';

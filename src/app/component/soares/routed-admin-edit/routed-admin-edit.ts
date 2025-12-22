@@ -85,7 +85,7 @@ export class SoaresRoutedAdminEdit implements OnInit {
                 this.mostrarToast('Pregunta actualizada correctamente', 'success');
                 setTimeout(() => {
                     this.router.navigate(['/soares/admin/plist']);
-                }, 2000);
+                }, 1000);
             },
             error: (err: HttpErrorResponse) => {
                 this.submitting = false;
@@ -99,7 +99,7 @@ export class SoaresRoutedAdminEdit implements OnInit {
     mostrarToast(mensaje: string, tipo: 'success' | 'error') {
         this.toastMessage = mensaje;
         this.toastType = tipo;
-        setTimeout(() => this.toastMessage = null, 2000);
+        setTimeout(() => this.toastMessage = null, 1000);
     }
 
     get preguntas() {
