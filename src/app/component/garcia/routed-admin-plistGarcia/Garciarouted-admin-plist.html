@@ -97,7 +97,7 @@
           </td>
           <td>{{ oGarcia.fechaFinal | datetime }}</td>
           <td class="text-center">
-            @if (oGarcia.publicado) {
+            @if (oGarcia.publico) {
             <span class="badge bg-success">
               <i class="bi bi-check-circle-fill"></i> Publicado
             </span>
@@ -116,7 +116,7 @@
                 <i class="bi bi-pencil-square"></i>
               </a>
 
-              @if (oGarcia.publicado) {
+              @if (oGarcia.publico) {
               <button (click)="despublicar(oGarcia.id)" class="btn btn-outline-warning" title="Despublicar">
                 <i class="bi bi-eye-slash"></i>
               </button>

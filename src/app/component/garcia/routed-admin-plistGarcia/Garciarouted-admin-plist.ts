@@ -36,7 +36,6 @@ export class RoutedAdminPlistGarcia {
       next: (data: IPage<IGarcia>) => {
         this.oPage = data;
         this.rellenaOk = this.oPage.totalElements;
-        // si estamos en una página que supera el límite entonces nos situamos en la ultima disponible
         if (this.numPage > 0 && this.numPage >= data.totalPages) {
           this.numPage = data.totalPages - 1;
           this.getPage();

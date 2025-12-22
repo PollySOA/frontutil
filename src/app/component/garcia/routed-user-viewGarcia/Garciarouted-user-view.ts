@@ -15,7 +15,6 @@ export class RoutedUserViewGarcia {
   oGarcia: IGarcia | null = null;
 
   constructor(private oGarciaService: GarciaService, private route: ActivatedRoute) {
-    // Obtener el ID del blog desde la ruta
     const idParam = this.route.snapshot.paramMap.get('id');
     const blogId = idParam ? Number(idParam) : NaN;
     if (isNaN(blogId)) {

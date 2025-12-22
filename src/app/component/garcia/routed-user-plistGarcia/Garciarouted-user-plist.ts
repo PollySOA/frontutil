@@ -28,7 +28,7 @@ export class RoutedUserPlistGarcia {
   }
 
   getPage() {
-    this.oGarciaService.getPagePublicados(this.numPage, this.numRpp).subscribe({  // 👈 CAMBIO AQUÍ
+    this.oGarciaService.getPagePublico(this.numPage, this.numRpp).subscribe({
       next: (data: IPage<IGarcia>) => {
         this.oPage = data;
         if (this.numPage > 0 && this.numPage >= data.totalPages) {

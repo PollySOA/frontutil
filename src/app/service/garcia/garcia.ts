@@ -50,8 +50,8 @@ export class GarciaService {
     return this.http.post<number>(`${this.url}/random/${cantidad}`, null);
   }
 
-  getPagePublicados(page: number, size: number): Observable<any> {
-    return this.http.get<any>(`${this.url}/publicados?page=${page}&size=${size}`);
+  getPagePublico(page: number, size: number): Observable<any> {
+    return this.http.get<any>(`${this.url}/publico?page=${page}&size=${size}`);
   }
 
   publicar(id: number): Observable<number> {

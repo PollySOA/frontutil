@@ -6,5 +6,5 @@ export interface IGarcia {
   fechaInicio: string;
   fechaFinal: string;
   fechaModificacion?: string;
-  publicado: boolean;
+  publico: boolean;
 }

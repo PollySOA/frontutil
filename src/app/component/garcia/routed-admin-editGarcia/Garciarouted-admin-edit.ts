@@ -50,7 +50,7 @@ export class RoutedAdminEditGarcia {
                 Validators.minLength(3),
                 Validators.maxLength(1024)]],
             fechaFinal: ['', [Validators.required]],
-            publicado: [false],
+            publico: [false],
         });
     }
 
@@ -69,7 +69,7 @@ export class RoutedAdminEditGarcia {
                     objetivo: garcia.objetivo,
                     progreso: garcia.progreso,
                     fechaFinal: fechaFinalFormatted,
-                    publicado: garcia.publicado,
+                    publico: garcia.publico,
                 });
                 this.loading = false;
             },
@@ -94,7 +94,7 @@ export class RoutedAdminEditGarcia {
             objetivo: this.garciaForm.value.objetivo,
             progreso: this.garciaForm.value.progreso,
             fechaFinal: this.garciaForm.value.fechaFinal,
-            publicado: this.garciaForm.value.publicado,
+            publico: this.garciaForm.value.publico,
         };
 
         this.garciaService.update(payload).subscribe({
@@ -126,7 +126,7 @@ export class RoutedAdminEditGarcia {
         return this.garciaForm.get('fechaFinal');
     }
 
-    get publicado() {
-        return this.garciaForm.get('publicado');
+    get publico() {
+        return this.garciaForm.get('publico');
     }
 }
