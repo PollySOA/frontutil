@@ -14,14 +14,19 @@ export class PallasService {
 
   // 1. GET PAGE (Listado paginado)
 
-  getPage(page: number, rpp: number, order: string = '', direction: string = ''): Observable<IPage<IPallas>> {
+  getPage(page: number, rpp: number, order: string = '',direction: string = '',filter: string = ''): Observable<IPage<IPallas>> {
       if (order === '') {
         order = 'id';
       }
       if (direction === '') {
         direction = 'asc';
       }
-      return this.oHttp.get<IPage<IPallas>>(serverURL + `/pallas?page=${page}&size=${rpp}&sort=${order},${direction}`);
+      let strUrl = serverURL + `/pallas?page=${page}&size=${rpp}&sort=${order},${direction}`;
+      if (filter.length > 0) {
+        strUrl += `&filter=${filter}`;
+      }
+
+      return this.oHttp.get<IPage<IPallas>>(strUrl);;
     }
 
   // 2. GET (Uno solo)
@@ -48,4 +53,12 @@ export class PallasService {
   rellenar(amount: number): Observable<number> {
     return this.oHttp.get<number>(serverURL + "/pallas/rellena/" + amount);
   }
+
+  // 7. GET PUBLIC PREVIEW
+  getPublicPreview(): Observable<IPallas[]> {
+  return this.oHttp.get<IPallas[]>(
+    serverURL + '/pallas/public/preview'
+  );
+}
+
 }

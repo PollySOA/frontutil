@@ -1,43 +1,67 @@
-<div class="home-container">
+<div class="home-wrapper">
   
-  <header class="text-center mb-5 animate-fade-in">
-    <h1 class="main-title">🚀 Pallas Notas</h1>
-    <p class="subtitle">Organiza tus ideas, domina tu tiempo.</p>
-  </header>
+  <section class="hero-section text-center py-5">
+    <div class="container">
+      <div class="mb-4 animate-fade-down">
+        <h1 class="main-title display-4 fw-bolder mb-3">
+          Bienvenido a <span class="text-gradient">Pallas Notas</span>
+        </h1>
+        <p class="lead text-muted mb-5 mx-auto" style="max-width: 600px;">
+          Tu espacio personal para organizar ideas, gestionar tareas y dominar tu tiempo con eficiencia.
+        </p>
+      </div>
 
-  <div class="container">
-    <div class="row justify-content-center">
       
-      <div class="col-md-6 col-lg-5 mb-4">
-        <div class="card custom-card h-100">
-          <div class="card-body text-center p-5">
-            <div class="icon-circle mb-4">
-              📝
-            </div>
-            <h3 class="card-title fw-bold">Administrador de Notas</h3>
-            <p class="card-text text-muted mb-4">
-              Gestiona todas tus notas con el CRUD completo.
-              Crea, edita, borra y genera datos de prueba.
-            </p>
-            
-            <button class="btn btn-grad w-100 py-3" [routerLink]="['/pallas/plist']">
-              Entrar al Panel de Control ➜
-            </button>
+      
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          
+          <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 fw-bold">
+            ✨ Gestión Inteligente v1.0
+          </span>
 
-            <div class="mt-3">
-              <a [routerLink]="['/pallas/new']" class="small-link">
-                + Crear una nota rápida
+          <div class="card action-card border-0 shadow-lg rounded-4 overflow-hidden mx-auto animate-fade-up" style="max-width: 500px;">
+            <div class="card-body p-4 p-md-5">
+              <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center">
+                <i class="bi bi-grid-fill fs-3"></i>
+              </div>
+              
+              <h3 class="fw-bold mb-2">Panel de Control</h3>
+              <p class="text-muted mb-4">Accede al CRUD completo para administrar tus notas.</p>
+              
+              <button class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm mb-3 py-3 fw-bold btn-hover-effect" 
+                      [routerLink]="['/pallas/plist']">
+                Entrar al Sistema <i class="bi bi-arrow-right ms-2"></i>
+              </button>
+
+              <a [routerLink]="['/pallas/new']" class="text-decoration-none text-secondary small fw-semibold link-hover">
+                <i class="bi bi-plus-circle me-1"></i> Crear una nota rápida
               </a>
             </div>
           </div>
         </div>
       </div>
-
+      <section class="preview-section bg-light bg-opacity-50 py-5 border-top">
+         <div class="container">
+           
+           <div class="text-center mb-5">
+             <h6 class="text-uppercase text-primary fw-bold letter-spacing-2">Vista Previa</h6>
+             <h3 class="fw-bold">Últimas Publicaciones</h3>
+           </div>
+     
+           <app-pallas-preview></app-pallas-preview>
+     
+         </div>
+       </section>
     </div>
-  </div>
+  </section>
 
-  <footer class="text-center mt-5 text-muted small">
-    <p>Proyecto Pallas © 2025 - Desarrollado con Angular 17 & Spring Boot</p>
+  <footer class="bg-white py-4 border-top text-center">
+    <div class="container">
+      <p class="text-muted small mb-0">
+        Proyecto Pallas © 2025 &bull; Desarrollado con <span class="text-danger">❤</span> usando Angular 17 & Spring Boot
+      </p>
+    </div>
   </footer>
 
 </div>
